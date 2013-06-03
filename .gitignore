@@ -1,0 +1,11 @@
+*~
+#eclipse
+.settings
+.classpath
+.project
+
+#binary
+bin/
+target/
+
+data/
