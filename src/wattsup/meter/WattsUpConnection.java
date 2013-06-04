@@ -72,14 +72,15 @@ class WattsUpConnection implements Closeable
 	 */
 	protected void disconnect()
 	{
-		this.serial.disconnect();
-		
 		try 
 		{
 			this.close();
 		} catch (IOException ignore) 
 		{
-			;
+			if (this.isConnected())
+			{
+				this.serial.disconnect();
+			}
 		}
 	}
 	
@@ -98,9 +99,17 @@ class WattsUpConnection implements Closeable
 		String instruction = getWattsUpInstructionFormat(command, arguments);
 		
 		output_.write(instruction.getBytes());
-		String reply = read();
 		
-		return WattsUpPacket.parser(reply, configuration_.getDelimiter());
+		//TODO create a type to encapsulate the meter's response.
+		WattsUpPacket[] response = new WattsUpPacket[0];
+		
+		if (command.waitResponse())
+		{
+			String reply = read();
+			response = WattsUpPacket.parser(reply, configuration_.getDelimiter());
+		}
+		
+		return response;
 	}
 
 	/**
@@ -180,6 +189,11 @@ class WattsUpConnection implements Closeable
 	@Override
 	public void close() throws IOException 
 	{
+		if (this.isConnected())
+		{
+			this.serial.disconnect();
+		}
+		
 		if (this.input_ != null) 
 		{
 			this.input_.close();
@@ -189,10 +203,8 @@ class WattsUpConnection implements Closeable
 		if (this.output_ != null) 
 		{
 			this.output_.close();
-			this.output_.close();
+			this.output_ = null;
 		}
-		
-		this.serial.disconnect();
 	}
 	
 	@Override

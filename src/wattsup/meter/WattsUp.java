@@ -9,32 +9,93 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import wattsup.data.WattsUpConfig;
 import wattsup.data.WattsUpPacket;
 import wattsup.event.WattsUpConnectedEvent;
 import wattsup.event.WattsUpDataAvailableEvent;
 import wattsup.event.WattsUpEvent;
-import wattsup.listener.WattsUpConnectionListerner;
 import wattsup.listener.WattsUpListener;
 
+import static wattsup.data.command.WattsUpCommand.*;
 import static wattsup.data.command.WattsUpCommand.CLEAR_MEMORY;
 import static wattsup.data.command.WattsUpCommand.CONFIGURE_INTERNAL_LOGGING_INTERVAL;
 import static wattsup.data.command.WattsUpCommand.REQUEST_ALL_DATA_LOGGED;
 
+/**
+ * Class to interact with the Watts Up? power meter. To use it, it's necessary:
+ * 
+ * <ul>
+ * <li>Creates an instance. Call the constructor {@link #WattsUp(WattsUpConfig)};</li>
+ * <li>Register a {@link wattsup.listener.WattsUpDataAvailableListener} listener to be notified when data (measure) are available. 
+ *    Call the method {@link #registerListener(WattsUpListener)}</li>
+ * <li>Connect to the meter. Call method {@link #connect()};</li>
+ * <li>Disconnect after you finish the work/experiment. Call the method {@link #disconnect()}.</li>
+ * </ul>
+ * 
+ * <br />
+ * <strong>Usage Example</strong>: Here is a class that connect to the power meter during three minutes and print the measures to the console.
+ * <pre>
+ * {@code
+ * public class WattsUpTest 
+ * {
+ * 	private static final long THREE_MINUTES = 3 * 60;
+ * 
+ * 	public static void main(String[] args) throws IOException 
+ * 	{
+ * 		final SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+ * 		final WattsUp meter = new WattsUp(new WattsUpConfig().withPort(args[0]).scheduleDuration(THREE_MINUTES));
+ * 
+ * 		meter.registerListener(new WattsUpDataAvailableListener() 
+ * 		{
+ * 			{@literal @}Override
+ * 			public void processDataAvailable(final WattsUpDataAvailableEvent event) 
+ * 			{
+ * 				WattsUpPacket[] values = event.getValue();
+ * 				System.out.printf("[%s] %s\n", format.format(new Date()), Arrays.toString(values));
+ * 			}
+ * 		});
+ * 		meter.connect();
+ * 	}
+ * }
+ * </pre>
+ */
 public final class WattsUp 
 {
-	private final List<WattsUpListener> listeners = new LinkedList<>();
-	
 	/**
-	 * The reference for the {@link WattsUpConnection} to execute the commands.
+	 * The listeners registered for this {@link WattsUp} meter.
 	 */
-	private WattsUpConnection connection_;
+	private final List<WattsUpListener> listeners_ = new LinkedList<>();
 
 	/**
 	 * The configuration to be used by the meter.
 	 */
 	private final WattsUpConfig config_;
+	
+	/**
+	 * The scheduler used to notify the clients about data available. 
+	 * The interval of the notification is determined through {@link WattsUpConfig} or the one given by the method {@link #configureExternalLoggingInterval(int)}.
+	 */
+	private ScheduledExecutorService scheduler_;
+	
+	/**
+	 * The reference for the {@link WattsUpConnection} to execute the commands.
+	 */
+	private WattsUpConnection connection_;
+	
+	/**
+	 * A flag to indicate if the meter is ready.
+	 */
+	private volatile boolean configured_;
+	
+	/**
+	 * Flag to indicate if this meter is connected.
+	 */
+	private volatile boolean connected_;
 	
 	/**
 	 * Creates an instance of this {@link WattsUp} meter.
@@ -44,34 +105,6 @@ public final class WattsUp
 	public WattsUp(final WattsUpConfig config) 
 	{
 		this.config_ = config;
-		
-		this.registerListener(new WattsUpConnectionListerner() 
-		{
-			@Override
-			public void onConnected(WattsUpConnectedEvent event) 
-			{
-				Thread pooling = new Thread(new Runnable() 
-				{
-					@Override
-					public void run() 
-					{
-						while(isConnected())
-						{
-							try 
-							{
-								retrieveAllData();
-								Thread.sleep(config.getExternalLoggingInterval() * 1000);
-							} catch (InterruptedException | IOException ie) 
-							{
-								Thread.currentThread().interrupt();
-							}
-						}
-					}
-				}, "internal-event");
-				pooling.setDaemon(true);
-				pooling.start();
-			}
-		});
 	}
 
 	/**
@@ -86,7 +119,7 @@ public final class WattsUp
 		{
 			throw new NullPointerException("The listener might not be null!");
 		}
-		this.listeners.add(listener);
+		this.listeners_.add(listener);
 	}
 	
 	/**
@@ -101,7 +134,7 @@ public final class WattsUp
 		
 		if (listener != null)
 		{
-			removed = this.listeners.remove(listener);
+			removed = this.listeners_.remove(listener);
 		}
 		
 		return removed;
@@ -109,35 +142,76 @@ public final class WattsUp
 	
 	
 	/**
-	 * Connect to the meter.
+	 * Connect to the meter. After connect the meter is reseted.
+	 * @throws IOException If the power meter is not available. 
+	 * @see #connect(boolean)
+	 * @see #reset()
 	 */
-	public void connect()
+	public void connect() throws IOException
 	{
-		connection_ = new WattsUpConnection(this.config_);
+		connect(true);
+	}
+	
+	/**
+	 * Connect to the power meter and reset the memory if configured.
+	 * 
+	 * @param reset Flag to indicates if the meter should be reseted.
+	 * @throws IOException If the power meter is not available.
+	 * @see #reset()
+	 */
+	public void connect(boolean reset) throws IOException
+	{
+        connection_ = new WattsUpConnection(this.config_);
 		
 		if (connection_.connect())
 		{
+			configure();
+			
+			if (reset)
+	        {
+	        	this.reset();
+	        }
 			notify(new WattsUpConnectedEvent(this));
+			this.connected_ = true;
 		}
+		
+		start();
 	}
 	
+	/**
+	 * Configure the device parameters. 
+	 * @throws IOException If the device is not connected. 
+	 */
+	private void configure() throws IOException 
+	{
+		configureExternalLoggingInterval(this.config_.getExternalLoggingInterval());
+		configured_ = true;
+	}
+
 	/**
 	 * Returns <code>true</code> if the meter is online (connected).
 	 * @return <code>true</code> if the meter is online (connected).
 	 */
 	public boolean isConnected()
 	{
-		return this.connection_.isConnected();
+		return this.connected_ && this.connection_.isConnected();
 	}
 	
 	/**
 	 * Disconnect from the power meter.
+	 * @throws IOException If the meter is disconnected. 
 	 */
-	public void disconnect()
+	public void disconnect() throws IOException
 	{
 		if (connection_ != null)
 		{
+			this.scheduler_.shutdownNow();
+			
+			this.stop();
 			this.connection_.disconnect();
+			
+			this.configured_ = false;
+			this.connected_ = false;
 		}
 	}
 	
@@ -156,15 +230,9 @@ public final class WattsUp
 	 * @return A non-null array with the all data available in the meter.
 	 * @throws IOException If is not possible to retrieve the data.
 	 */
-	public WattsUpPacket[] retrieveAllData() throws IOException
+	public WattsUpPacket[] records() throws IOException
 	{
-		final WattsUpPacket[] data = this.connection_.execute(REQUEST_ALL_DATA_LOGGED);
-		
-		if (data.length > 0)
-		{
-			notify(new WattsUpDataAvailableEvent(this, data));
-		}
-		return data;
+		return this.connection_.execute(REQUEST_ALL_DATA_LOGGED);
 	}
 	
 	/**
@@ -173,12 +241,82 @@ public final class WattsUp
 	 * @param interval The interval in seconds to be set. Might be greater than zero.
 	 * @throws IOException If the communication with the meter is not possible. 
 	 */
-	public void setInternalLoggingInterval(int interval) throws IOException
+	public void configureInternalLoggingInterval(int interval) throws IOException
 	{
-		this.connection_.execute(CONFIGURE_INTERNAL_LOGGING_INTERVAL, "I", "1", String.valueOf(interval), String.valueOf(interval));
+		this.connection_.execute(CONFIGURE_INTERNAL_LOGGING_INTERVAL, "I", String.valueOf(interval), String.valueOf(interval));
 	}
 	
+	/**
+	 * Start up logging with the given {@code interval}.
+	 * 
+	 * @param interval The interval in seconds to configure the external logging.
+	 * @throws IOException If it is not possible communicating with the meter.
+	 */
+	public void configureExternalLoggingInterval(int interval) throws IOException 
+	{
+		this.connection_.execute(CONFIGURE_EXTERNAL_LOGGING_INTERVAL, "E", String.valueOf(interval), String.valueOf(interval));
+	}
 	
+	/**
+	 * Stop logging this meter events.
+	 * @throws IOException If it is not possible communicating with the meter.
+	 */
+	public void stop() throws IOException
+	{
+		this.connection_.execute(STOP_LOGGING);
+	}
+	
+	/**
+	 * Start up logging with the given {@code interval}.
+	 */
+	protected final void start()
+	{
+		scheduler_ = Executors.newScheduledThreadPool(1);
+		final ScheduledFuture<?> handler = scheduler_.scheduleAtFixedRate(new Runnable() 
+		{
+			@Override
+			public void run() 
+			{
+				try 
+				{
+					if (isConnected() && configured_)
+					{ 
+						final String data = connection_.read();
+						final WattsUpPacket[] records = WattsUpPacket.parser(data, config_.getDelimiter());
+						
+						if (records.length > 0)
+						{
+							WattsUp.this.notify(new WattsUpDataAvailableEvent(this, records));
+						}
+					}
+				} 
+				catch (IOException exception) 
+				{
+					;
+				}
+			}
+		},1, config_.getExternalLoggingInterval(), TimeUnit.SECONDS);	
+		
+		if (config_.getScheduleDurationInSeconds() > 0)
+		{
+			scheduler_.schedule(new Runnable() 
+			{
+				@Override
+				public void run() 
+				{
+					try 
+					{
+						handler.cancel(true);
+						disconnect();
+					} 
+					catch (IOException ignore) 
+					{
+						;
+					}
+				}
+			}, config_.getScheduleDurationInSeconds(), TimeUnit.SECONDS);
+		}
+	}
 	
 	private Map<Class<WattsUpEvent<?>>, WattsUpEventInfo> eventListenerMap = new WeakHashMap<>();
 	
@@ -189,7 +327,7 @@ public final class WattsUp
 	@SuppressWarnings("unchecked")
 	private <T> void notify(WattsUpEvent<T> event) 
 	{
-		for(WattsUpListener listener : listeners)
+		for(WattsUpListener listener : listeners_)
 		{
 			if (event.isAppropriateListener(listener))
 			{
