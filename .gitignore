@@ -3,9 +3,12 @@
 .settings
 .classpath
 .project
+.checkstyle
 
 #binary
 bin/
 target/
+lib/
 
 data/
+
