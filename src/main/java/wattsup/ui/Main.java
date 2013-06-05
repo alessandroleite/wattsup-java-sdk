@@ -1,28 +1,28 @@
 /**
- * Copyright (c) 2012 GreenI2R
+ *     WattsUp-J is a Java application to interact with the Watts up? power meter.
+ *     Copyright (C) 2013  Contributors
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ *     Contributors:
+ *         Alessandro Ferreira Leite - the initial implementation.
  */
 package wattsup.ui;
 
 import java.awt.Dimension;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,10 @@ import javax.swing.JTabbedPane;
 import wattsup.data.WattsUpConfig;
 import wattsup.data.WattsUpPacket;
 import wattsup.event.WattsUpDataAvailableEvent;
+import wattsup.event.WattsUpDisconnectEvent;
 import wattsup.listener.WattsUpDataAvailableListener;
+import wattsup.listener.WattsUpDisconnectListener;
+import wattsup.listener.impl.ExportCsvListener;
 import wattsup.meter.WattsUp;
 import wattsup.ui.chart.line.WattsLineChart;
 
@@ -82,7 +85,6 @@ public class Main extends JFrame
     }
 
     /**
-     * 
      * @throws IOException
      *             If the meter is not available.
      */
@@ -96,6 +98,39 @@ public class Main extends JFrame
             {
                 data_.clear();
                 data_.addAll(Arrays.asList(event.getValue()));
+            }
+        });
+        
+        String path = System.getProperty("export.file.path");
+        
+        if (path != null && !path.isEmpty())
+        {
+            final FileOutputStream fos = new FileOutputStream(new File(path));
+            meter_.registerListener(new ExportCsvListener(fos));
+            
+            Runtime.getRuntime().addShutdownHook(new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        fos.close();
+                    }
+                    catch (IOException ignore)
+                    {
+                        ignore.printStackTrace();
+                    }
+                }
+            });
+        }
+        
+        meter_.registerListener(new WattsUpDisconnectListener()
+        {
+            @Override
+            public void onDisconnect(WattsUpDisconnectEvent event)
+            {
+                System.exit(0);
             }
         });
 
@@ -149,6 +184,11 @@ public class Main extends JFrame
      */
     public static void main(final String[] args) throws IOException
     {
-        new Main(new WattsUpConfig().withPort(args[0]).scheduleDuration(3 * 60));
+        if (args.length == 0)
+        {
+            throw new IllegalArgumentException("The path to the serial port is required!");
+        }
+        
+        new Main(new WattsUpConfig().withPort(args[0]).scheduleDuration(Integer.valueOf(System.getProperty("measure.duration", "0"))));
     }
 }

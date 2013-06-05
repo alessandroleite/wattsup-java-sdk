@@ -1,3 +1,23 @@
+/**
+ *     WattsUp-J is a Java application to interact with the Watts up? power meter.
+ *     Copyright (C) 2013  Contributors
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ *     Contributors:
+ *         Alessandro Ferreira Leite - the initial implementation.
+ */
 package wattsup.event;
 
 import java.util.EventObject;
@@ -17,24 +37,29 @@ public abstract class WattsUpEvent<T> extends EventObject
     public static enum EventType
     {
         /**
-         * Notifies when a connection with the meter is established.
+         * Signal a successfully connection with the meter.
          */
         CONNECT,
 
         /**
-         * Notifies the reset (memory clear) of the meter.
+         * Signal about the memory reset.
          */
         RESET,
 
         /**
-         * Notifies when there are data available. The frequency of the event is determined by the external sampling interval.
+         * Signal when there are data available.
          */
         DATA_AVAILABLE,
 
         /**
-         * Notifies when the connection with the meter closed.
+         * Signal when the connection with the meter was closed.
          */
-        DISCONNECT;
+        DISCONNECT, 
+        
+        /**
+         * Signal when the meter stop logging.
+         */
+        STOP_LOGGING;
     }
 
     /**

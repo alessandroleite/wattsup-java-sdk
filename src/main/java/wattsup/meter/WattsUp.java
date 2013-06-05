@@ -1,3 +1,23 @@
+/**
+ *     WattsUp-J is a Java application to interact with the Watts up? power meter.
+ *     Copyright (C) 2013  Contributors
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ *     Contributors:
+ *         Alessandro Ferreira Leite - the initial implementation.
+ */
 package wattsup.meter;
 
 import java.io.IOException;
@@ -11,15 +31,19 @@ import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import wattsup.data.WattsUpConfig;
 import wattsup.data.WattsUpPacket;
 import wattsup.event.WattsUpConnectedEvent;
 import wattsup.event.WattsUpDataAvailableEvent;
+import wattsup.event.WattsUpDisconnectEvent;
 import wattsup.event.WattsUpEvent;
+import wattsup.event.WattsUpMemoryCleanEvent;
+import wattsup.event.WattsUpStopLoggingEvent;
 import wattsup.exception.WattsUpException;
 import wattsup.listener.WattsUpListener;
 
@@ -97,6 +121,11 @@ public final class WattsUp
      * the one given by the method {@link #configureExternalLoggingInterval(int)}.
      */
     private ScheduledExecutorService scheduler_;
+    
+    /**
+     * The executor to notify the listener about the events.
+     */
+    private ScheduledExecutorService listenerNotifyExecutor_ = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     /**
      * The reference for the {@link WattsUpConnection} to execute the commands.
@@ -240,6 +269,27 @@ public final class WattsUp
 
             this.configured_ = false;
             this.connected_ = false;
+            
+            notify(new WattsUpDisconnectEvent(this, System.currentTimeMillis()));
+            
+            List<Runnable> waitingTasks = null;
+            
+            try
+            {
+                if (!listenerNotifyExecutor_.awaitTermination(5, SECONDS))
+                {
+                     waitingTasks = listenerNotifyExecutor_.shutdownNow();
+                }
+            }
+            catch (InterruptedException ie)
+            {
+                waitingTasks = listenerNotifyExecutor_.shutdownNow();
+            }
+            
+            if (LOG.isLoggable(Level.INFO) && waitingTasks != null && !waitingTasks.isEmpty())
+            {
+                LOG.info(String.format("There was/were %s events(s) waiting to be notified!", waitingTasks.size()));
+            }
         }
     }
 
@@ -252,6 +302,7 @@ public final class WattsUp
     public void reset() throws IOException
     {
         this.connection_.execute(CLEAR_MEMORY);
+        notify(new WattsUpMemoryCleanEvent(this, System.currentTimeMillis()));
     }
 
     /**
@@ -301,6 +352,7 @@ public final class WattsUp
     public void stop() throws IOException
     {
         this.connection_.execute(STOP_LOGGING);
+        notify(new WattsUpStopLoggingEvent(this, System.currentTimeMillis()));
     }
 
     /**
@@ -309,30 +361,8 @@ public final class WattsUp
     protected void start()
     {
         scheduler_ = Executors.newScheduledThreadPool(1);
-        final ScheduledFuture<?> handler = scheduler_.scheduleAtFixedRate(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    if (isConnected() && configured_)
-                    {
-                        final String data = connection_.read();
-                        final WattsUpPacket[] records = WattsUpPacket.parser(data, config_.getDelimiter(), System.currentTimeMillis());
-
-                        if (records.length > 0)
-                        {
-                            WattsUp.this.notify(new WattsUpDataAvailableEvent(this, records));
-                        }
-                    }
-                }
-                catch (IOException exception)
-                {
-                    LOG.log(Level.INFO, exception.getMessage(), exception);
-                }
-            }
-        }, 1, config_.getExternalLoggingInterval(), TimeUnit.SECONDS);
+        final ScheduledFuture<?> handler = scheduler_
+                .scheduleAtFixedRate(new WattsUpStreamReader(), 1, config_.getExternalLoggingInterval(), SECONDS);
 
         if (config_.getScheduleDurationInSeconds() > 0)
         {
@@ -351,7 +381,7 @@ public final class WattsUp
                         LOG.log(Level.WARNING, ignore.getMessage(), ignore);
                     }
                 }
-            }, config_.getScheduleDurationInSeconds(), TimeUnit.SECONDS);
+            }, config_.getScheduleDurationInSeconds(), SECONDS);
         }
     }
 
@@ -364,31 +394,38 @@ public final class WattsUp
      *            The event's data type.
      */
     @SuppressWarnings("unchecked")
-    private <T> void notify(WattsUpEvent<T> event)
+    private <T> void notify(final WattsUpEvent<T> event)
     {
-        for (WattsUpListener listener : listeners_)
+        listenerNotifyExecutor_.execute(new Runnable()
         {
-            if (event.isAppropriateListener(listener))
+            @Override
+            public void run()
             {
-                WattsUpEventInfo eventInfo = eventListenerMap_.get(event.getClass());
+                for (WattsUpListener listener : listeners_)
+                {
+                    if (event.isAppropriateListener(listener))
+                    {
+                        WattsUpEventInfo eventInfo = eventListenerMap_.get(event.getClass());
 
-                if (eventInfo == null)
-                {
-                    eventInfo = new WattsUpEventInfo();
-                    eventListenerMap_.put((Class<WattsUpEvent<?>>) event.getClass(), eventInfo);
-                }
+                        if (eventInfo == null)
+                        {
+                            eventInfo = new WattsUpEventInfo();
+                            eventListenerMap_.put((Class<WattsUpEvent<?>>) event.getClass(), eventInfo);
+                        }
 
-                try
-                {
-                    Method method = eventInfo.getEventMethodFor(event, listener);
-                    Objects.requireNonNull(method).invoke(listener, event);
-                }
-                catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException exception)
-                {
-                    throw new WattsUpException(exception.getMessage(), exception);
+                        try
+                        {
+                            Method method = eventInfo.getEventMethodFor(event, listener);
+                            Objects.requireNonNull(method).invoke(listener, event);
+                        }
+                        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException exception)
+                        {
+                            throw new WattsUpException(exception.getMessage(), exception);
+                        }
+                    }
                 }
             }
-        }
+        });
     }
 
     private static final class WattsUpEventInfo
@@ -427,6 +464,30 @@ public final class WattsUp
                 }
             }
             return method;
+        }
+    }
+    
+    private class WattsUpStreamReader implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                if (isConnected() && configured_)
+                {
+                    final WattsUpPacket[] records = WattsUpPacket.parser(connection_.read(), config_.getDelimiter(), System.currentTimeMillis());
+
+                    if (records.length > 0)
+                    {
+                        WattsUp.this.notify(new WattsUpDataAvailableEvent(this, records));
+                    }
+                }
+            }
+            catch (IOException exception)
+            {
+                LOG.log(Level.INFO, exception.getMessage(), exception);
+            }
         }
     }
 }

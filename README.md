@@ -9,12 +9,12 @@ A Java application to communicate with the [Watts up?](https://www.wattsupmeters
 Usage
 ------
 
-Here is a class that connect to the power meter during three minutes and print the measures in console. 
+Here is a class that connect to the power meter during three minutes and print the measures to the console. 
 
 	public final class WattsUpTest
 	{	    
 	    /**
-	     * Creates an {@link WattsUp} for monitoring during one minute.
+	     * Creates an {@link WattsUp} for monitoring during three minutes.
 	     * 
 	     * @param args
 	     *            The reference to the arguments.
@@ -39,7 +39,7 @@ Here is a class that connect to the power meter during three minutes and print t
 	    }
 	}
 
-### Run:
+### Running:
 
 	java -cp lib/nrjavaserial-3.8.8.jar wattsup.meter.test.WattsUpTest /dev/ttyUSB0
    

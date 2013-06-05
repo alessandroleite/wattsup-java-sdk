@@ -1,0 +1,240 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<groupId>wattsup</groupId>
+	<artifactId>wattsupj</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>wattsupj</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.source.version>1.7</java.source.version>
+		<internal.snapshots.repo.path>file://${project.basedir}/../maven-repo/snapshots</internal.snapshots.repo.path>
+		<internal.release.repo.path>file://${project.basedir}/../maven-repo/releases</internal.release.repo.path>
+		<license-header-file>${basedir}/license-header.txt</license-header-file>
+		<checkstyle.file>${project.basedir}/checkstyle.xml</checkstyle.file>
+		<jfreechart.version>1.0.14</jfreechart.version>
+		<nrjavaserial.version>3.8.8</nrjavaserial.version>
+	</properties>
+
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.</name>
+			<url>http://www.fsf.org/licensing/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<distributionManagement>
+		<repository>
+			<id>deploy-release-repo</id>
+			<name>deploy-release-repo</name>
+			<url>${deploy-repo.url}/releases</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>deploy-snapshot-repo</id>
+			<name>deploy-snapshot-repo</name>
+			<url>${deploy-repo.url}/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:ssh://github.com/alessandroleite/wattsup.git</connection>
+		<developerConnection>scm:git:git@github.com:alessandroleite/wattsup.git</developerConnection>
+		<url>https://github.com/alessandroleite/wattsup</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>Alessandro Ferreira Leite</name>
+			<email>first-name[dot]last-name[dot]first-name[dot]cc</email>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>${jfreechart.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.neuronrobotics</groupId>
+			<artifactId>nrjavaserial</artifactId>
+			<version>${nrjavaserial.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<configLocation>${checkstyle.file}</configLocation>
+					<headerLocation>${license-header-file}</headerLocation>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<source>${java.source.version}</source>
+					<target>${java.source.version}</target>
+					<showDeprecation>true</showDeprecation>
+					<XaddSerialVersionUID>true</XaddSerialVersionUID>
+					<compilerArgument>-Xlint:all</compilerArgument>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<inherited>true</inherited>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.9.0</version>
+				<configuration>
+					<header>${license-header-file}</header>
+					<excludes>
+						<exclude>License.txt</exclude>
+						<exclude>**/.so</exclude>
+						<exclude>**/README.md</exclude>
+						<exclude>**/travis.yml</exclude>
+						<exclude>**/checkstyle.xml</exclude>
+						<exclude>**/.checkstyle</exclude>
+					</excludes>
+					<strictCheck>true</strictCheck>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.maven.ide.eclipse.maven2Nature</projectnature>
+						<projectnature>org.eclipse.jem.workbench.JavaEMFNature</projectnature>
+						<projectnature>org.eclipse.wst.jsdt.core.jsNature </projectnature>
+						<projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.maven.ide.eclipse.maven2Builder</buildcommand>
+						<buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
+						<forceRecheck>true</forceRecheck>
+					</additionalBuildcommands>
+					<additionalConfig>
+						<file>
+							<name>.checkstyle</name>
+							<content>
+							  <![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+							<fileset-config file-format-version="1.2.0" simple-config="true" sync-formatter="true">
+							  <local-check-config name="${project.groupId}-checkstyle" location="${checkstyle.file}" type="external" description="">
+							    <additional-data name="protect-config-file" value="false"/>
+							  </local-check-config>
+							  <fileset name="all" enabled="true" check-config-name="${project.groupId}-checkstyle" local="true">
+							    <file-match-pattern match-pattern="." include-pattern="true"/>
+							  </fileset>
+							</fileset-config>
+					]]>
+							</content>
+						</file>
+					</additionalConfig>
+					<useProjectReferences>true</useProjectReferences>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<projectNameTemplate>[groupId]-[artifactId]-[version]</projectNameTemplate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${buildNumber}</Implementation-Build>
+							<mode>development</mode>
+						</manifestEntries>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>${project.finalName}</finalName>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<attach>true</attach>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
