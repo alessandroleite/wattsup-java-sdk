@@ -19,6 +19,5 @@
 #     Contributors:
 #         Alessandro Ferreira Leite - the initial implementation.
 #
-# Example of usage: 
-#   ./show-chart.sh 20 one_core.csv /dev/ttyUSB0
-java -cp .:target/wattsupj-1.0.0-SNAPSHOT.jar -Dmeasure.duration=$1 -Dexport.file.path=$2 wattsup.ui.Main $3
+
+java -cp .:../target/wattsupj-1.0.0-SNAPSHOT.jar -Dmeasure.duration=$1 -Dexport.file.path=$2 wattsup.ui.Main $3
