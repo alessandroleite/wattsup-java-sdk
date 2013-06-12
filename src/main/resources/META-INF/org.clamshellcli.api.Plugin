@@ -1,0 +1,6 @@
+org.clamshellcli.wattsup.WattsUpSplashScreen
+org.clamshellcli.wattsup.WattsUpController
+org.clamshellcli.wattsup.ConnectCommand
+org.clamshellcli.wattsup.DescribeCommand
+org.clamshellcli.wattsup.ListCommand
+org.clamshellcli.wattsup.ExecCommand

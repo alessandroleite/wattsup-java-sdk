@@ -19,12 +19,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.source.version>1.7</java.source.version>
+		
 		<internal.snapshots.repo.path>file://${project.basedir}/../maven-repo/snapshots</internal.snapshots.repo.path>
 		<internal.release.repo.path>file://${project.basedir}/../maven-repo/releases</internal.release.repo.path>
+		<clamshellcli.repo>http://s3.amazonaws.com/repo.clamshellcli.org/release/</clamshellcli.repo>
+		
 		<license-header-file>${basedir}/license-header.txt</license-header-file>
 		<checkstyle.file>${project.basedir}/checkstyle.xml</checkstyle.file>
 		<jfreechart.version>1.0.14</jfreechart.version>
 		<nrjavaserial.version>3.8.8</nrjavaserial.version>
+		<jedis.version>2.0.0</jedis.version>
+		<clamshell-api.version>0.5.2</clamshell-api.version>
 	</properties>
 
 
@@ -50,6 +55,14 @@
 		</snapshotRepository>
 	</distributionManagement>
 
+	<repositories>
+		<repository>
+			<id>clamshellcli.repo</id>
+			<name>Clamshell-Cli Repository</name>
+			<url>${clamshellcli.repo}</url>
+		</repository>
+	</repositories>
+
 	<scm>
 		<connection>scm:git:ssh://github.com/alessandroleite/wattsup.git</connection>
 		<developerConnection>scm:git:git@github.com:alessandroleite/wattsup.git</developerConnection>
@@ -69,14 +82,36 @@
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
 			<version>${jfreechart.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
 			<version>${nrjavaserial.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.clamshellcli</groupId>
+			<artifactId>clamshell-api</artifactId>
+			<version>${clamshell-api.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.clamshellcli</groupId>
+			<artifactId>clamshell-impl-core</artifactId>
+			<version>${clamshell-api.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
