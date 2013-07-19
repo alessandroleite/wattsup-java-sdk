@@ -1,6 +1,25 @@
+/**
+ *     WattsUp-J is a Java application to interact with the Watts up? power meter.
+ *     Copyright (C) 2013  Contributors
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ *     Contributors:
+ *         Alessandro Ferreira Leite - the initial implementation.
+ */
 package org.clamshellcli.wattsup;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,12 +30,12 @@ public class CommandDescriptor implements Command.Descriptor
     /**
      * 
      */
-    public static final String NAMESPACE = "watts";
+    public static final String NAMESPACE = "wattsup";
 
     /**
      * The command arguments.
      */
-    private final Map<String, Arg> arguments_ = new HashMap<>();
+    private final Map<String, String> arguments_ = new HashMap<>();
 
     /**
      * The command's description.
@@ -66,14 +85,14 @@ public class CommandDescriptor implements Command.Descriptor
 
         for (Arg arg : args)
         {
-            this.arguments_.put(arg.getName(), arg);
+            this.arguments_.put(arg.getName(), arg.getName());
         }
     }
 
     @Override
     public Map<String, String> getArguments()
     {
-        return null;
+        return this.arguments_;
     }
 
     @Override
@@ -98,52 +117,5 @@ public class CommandDescriptor implements Command.Descriptor
     public String getUsage()
     {
         return this.usage_;
-    }
-
-    public static class Arg implements Serializable
-    {
-        /**
-         * Serial code version <code>serialVersionUID</code> for serialization.
-         */
-        private static final long serialVersionUID = -7372809669449521274L;
-
-        /**
-         * The command parameter's name.
-         */
-        private final String name_;
-
-        /**
-         * The command parameter's description.
-         */
-        private final String description_;
-
-        /**
-         * 
-         * @param name
-         *            The argument name. Might not be <code>null</code>.
-         * @param description
-         *            The argument description.
-         */
-        public Arg(String name, String description)
-        {
-            this.name_ = name;
-            this.description_ = description;
-        }
-
-        /**
-         * @return the name_
-         */
-        public String getName()
-        {
-            return name_;
-        }
-
-        /**
-         * @return the description_
-         */
-        public String getDescription()
-        {
-            return description_;
-        }
     }
 }

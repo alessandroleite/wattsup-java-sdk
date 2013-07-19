@@ -1,39 +1,47 @@
+/**
+ *     WattsUp-J is a Java application to interact with the Watts up? power meter.
+ *     Copyright (C) 2013  Contributors
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ *     Contributors:
+ *         Alessandro Ferreira Leite - the initial implementation.
+ */
 package org.clamshellcli.wattsup;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import org.clamshellcli.api.Command;
 import org.clamshellcli.api.Context;
 import org.clamshellcli.core.AnInputController;
 import org.clamshellcli.core.ShellException;
 
-
 public class WattsUpController extends AnInputController
 {
-    /**
-     * The namespace of Watts Up? commands.
-     */
-    private static final String WATTSUP_NAMESPACE = "wattsup";
-
     /**
      * The commands founds by this controller.
      */
     private Map<String, Command> commands_;
 
-    /**
-     * The library to work with JSON format.
-     */
-    private Gson gson_;
+//    /**
+//     * The library to work with JSON format.
+//     */
+//    private Gson gson_;
 
     @Override
     public boolean handle(Context ctx)
@@ -44,28 +52,24 @@ public class WattsUpController extends AnInputController
         {
             String[] tokens = cmdLine.split("\\s+");
             String cmdName = tokens[0];
-            Map<String, Object> argsMap = null;
+            Map<String, Arg> argsMap = new LinkedHashMap<String, Arg>();
 
-            // if there are arguments
+            // Are there arguments?
             if (tokens.length > 1)
             {
-                String argsString = convertToStringSeparedByComma(Arrays.copyOfRange(tokens, 1, tokens.length));
-                String argsJson = "{" + argsString + "}";
-                try
+                for (int i = 1; i < tokens.length; i += 2)
                 {
-                    Type mapType = new TypeToken<Map<String, Object>>() { } .getType();
-                    argsMap = gson_.fromJson(argsJson, mapType);
-                }
-                catch (JsonSyntaxException ex)
-                {
-                    ctx.getIoConsole().writeOutput(
-                            String.format("%nUnable to parse command parameters [%s]: " + " %s.%n%n", argsJson, ex.getMessage()));
-                    handled = true;
+                    Arg arg = new Arg(tokens[i]);
+                    if (i < tokens.length - 1)
+                    {
+                        arg.setValue(tokens[i + 1]);
+                    }
+                    argsMap.put(arg.getName(), arg);
                 }
             }
 
             Command cmd = commands_ != null ? commands_.get(cmdName) : null;
-            
+
             if (cmd != null)
             {
                 ctx.putValue(Context.KEY_COMMAND_LINE_ARGS, argsMap);
@@ -92,11 +96,11 @@ public class WattsUpController extends AnInputController
     public void plug(Context plug)
     {
         super.plug(plug);
-        gson_ = new Gson();
+//        gson_ = new GsonBuilder().create();
 
-        List<Command> wattsUpsCommands = plug.getCommandsByNamespace(WATTSUP_NAMESPACE);
+        List<Command> wattsUpsCommands = plug.getCommandsByNamespace("wattsup");
 
-        if (wattsUpsCommands.isEmpty())
+        if (!wattsUpsCommands.isEmpty())
         {
             commands_ = plug.mapCommands(wattsUpsCommands);
 
@@ -116,27 +120,5 @@ public class WattsUpController extends AnInputController
         {
             plug.getIoConsole().writeOutput(String.format("%nNo commands were found for input controller" + " [%s].%n%n", this.getClass().getName()));
         }
-    }
-
-    /**
-     * Returns a {@link String} with the values of {@code params} separated by comma(,).
-     * 
-     * @param params The array to be converted to n {@link String}. Might not be <code>null</code>.
-     * @return A {@link String} with the values of {@code params} separated by comma(,).
-     * @throws NullPointerException If {@code params} is <code>null</code>.
-     */
-    private String convertToStringSeparedByComma(final String[] params)
-    {
-        StringBuffer buff = new StringBuffer();
-
-        for (int i = 0; i < Objects.requireNonNull(params.length); i++)
-        {
-            buff.append(params[i].trim());
-            if (i < (params.length - 1))
-            {
-                buff.append(",");
-            }
-        }
-        return buff.toString();
     }
 }

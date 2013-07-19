@@ -27,22 +27,27 @@ import java.io.OutputStream;
 
 import wattsup.data.WattsUpConfig;
 import wattsup.event.WattsUpDisconnectEvent;
-import wattsup.listener.WattsUpDataAvailableListener;
 import wattsup.listener.WattsUpDisconnectListener;
 import wattsup.listener.impl.ExportCsvListener;
 import wattsup.meter.WattsUp;
 
-public final class Console
+public final class Main
 {
 
     /**
      * Constructor.
      */
-    private Console()
+    private Main()
     {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @param args
+     *            The serial port reference where the meter is connected.
+     * @throws IOException
+     *             If the meter is not connected or if it's impossible to connect to it.
+     */
     public static void main(String[] args) throws IOException
     {
         if (args.length == 0)
@@ -53,9 +58,8 @@ public final class Console
         WattsUp meter = new WattsUp(new WattsUpConfig().withPort(args[0]).scheduleDuration(
                 Integer.valueOf(System.getProperty("measure.duration", "0"))));
 
-        
         OutputStream out = System.out;
-        
+
         final String exportFilePath = System.getProperty("export.file.path");
         if (exportFilePath != null && !exportFilePath.isEmpty())
         {
@@ -70,9 +74,8 @@ public final class Console
                 System.exit(0);
             }
         });
-        
-        WattsUpDataAvailableListener listener = new ExportCsvListener(out);
-        meter.registerListener(listener);
+
+        meter.registerListener(new ExportCsvListener(out));
         meter.connect();
     }
 }

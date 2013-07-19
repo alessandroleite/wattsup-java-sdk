@@ -20,17 +20,15 @@
  */
 package org.clamshellcli.wattsup;
 
-import org.clamshellcli.api.Command;
 import org.clamshellcli.api.Context;
+import org.clamshellcli.api.Prompt;
 
-public class ConfigurationCommand implements Command
+public class WattsUpPrompt implements Prompt
 {
     /**
-     * 
+     * The watts up prompt.
      */
-    private static final Descriptor COMMAND_DESCRIPTOR = new CommandDescriptor("config", "Define or read the parameter of the device.",
-            "config [port:<Serial Port name>]", new Arg("s", "Shows the parameters of the meter."), new Arg("d",
-                    "Defines the parameters of the meter."));
+    private static final String PROMPT = "watts-up > ";
 
     @Override
     public void plug(Context ctx)
@@ -38,14 +36,8 @@ public class ConfigurationCommand implements Command
     }
 
     @Override
-    public Object execute(Context ctx)
+    public String getValue(Context ctx)
     {
-        return null;
-    }
-
-    @Override
-    public Descriptor getDescriptor()
-    {
-        return COMMAND_DESCRIPTOR;
+        return PROMPT;
     }
 }

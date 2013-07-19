@@ -36,14 +36,35 @@ import wattsup.listener.WattsUpDataAvailableListener;
 public class ExportCsvListener implements WattsUpDataAvailableListener
 {
     /**
-     * The format of the data print to the {@code output}. 
+     * The format of the data print to the {@code output}.
      */
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    
+
     /**
      * The reference for the {@link OutputStream} to write the data.
      */
-    private OutputStream output_;
+    private final OutputStream output_;
+
+    /**
+     * A flag to indicate if the row's number must be included in the file.
+     */
+    private boolean addRownum_;
+    
+    /**
+     * A flag to indicate if a header number must be included in output. The header is the name of the fields/columns.
+     */
+    private boolean addHeader_;
+    
+    /**
+     * Flag to indicate if the header has already been inserted.
+     */
+    private volatile boolean headerAdded_;
+
+    /**
+     * The number of the row incremented after each write in the file.
+     */
+    private volatile int rownum_;
+
 
     /**
      * @param output
@@ -51,7 +72,48 @@ public class ExportCsvListener implements WattsUpDataAvailableListener
      */
     public ExportCsvListener(OutputStream output)
     {
+        this(output, true, true);
+    }
+
+    /**
+     * 
+     * @param output
+     *            The reference for the {@link OutputStream} to write the data as soon as they are available.
+     * @param addHeader
+     *            Flag to indicates if the header must be included in the output.
+     * @param addRownum
+     *            Flag to indicates if the row number must be included as the first column/field of the output file.
+     */
+    public ExportCsvListener(OutputStream output, boolean addHeader, boolean addRownum)
+    {
         this.output_ = Objects.requireNonNull(output);
+        this.addHeader_ = addHeader;
+        this.addRownum_ = addRownum;
+    }
+
+    /**
+     * Inserts the header into the output file. The header is the name of each field including only the letters [a-z,A-Z].
+     * 
+     * @param data
+     *            The reference to the {@link WattsUpPacket} that has the fields of the CSV's file.
+     * @param output
+     *            The reference to {@link StringBuffer} to append a line with the reader.
+     */
+    private void header(final WattsUpPacket data, final StringBuilder output)
+    {
+        if (addRownum_)
+        {
+            output.append("rownum").append(Delimiter.COMMA.getSymbol());
+        }
+        
+        output.append("date");
+        
+        for (Field f : data.getFields())
+        {
+            output.append(Delimiter.COMMA.getSymbol());
+            output.append(f.getName() != null ? f.getName().replaceAll("\\W", "") : "null");
+        }
+        output.append("\n");
     }
 
     @Override
@@ -60,13 +122,24 @@ public class ExportCsvListener implements WattsUpDataAvailableListener
         StringBuilder sb = new StringBuilder();
         external: for (WattsUpPacket data : event.getValue())
         {
-            sb.append(FORMAT.format(new Date(data.getTime())));
+            if (addHeader_ && !headerAdded_)
+            {
+                header(data, sb);
+                headerAdded_ = true;
+            }
+
+            if (addRownum_)
+            {
+                sb.append(++rownum_).append(Delimiter.COMMA.getSymbol());
+            }
             
-            for (Field f: data.getFields())
+            sb.append(FORMAT.format(new Date(data.getTime())));
+
+            for (Field f : data.getFields())
             {
                 try
                 {
-                    sb.append(Delimiter.COMMA.getSymbol());    
+                    sb.append(Delimiter.COMMA.getSymbol());
                     sb.append(Double.valueOf(f.getValue()) / 10);
                 }
                 catch (NumberFormatException nfe)
@@ -74,9 +147,9 @@ public class ExportCsvListener implements WattsUpDataAvailableListener
                     continue external;
                 }
             }
-            
+
             sb.append("\n");
-            
+
             try
             {
                 output_.write(sb.toString().getBytes());
@@ -85,7 +158,7 @@ public class ExportCsvListener implements WattsUpDataAvailableListener
             {
                 throw new WattsUpException(exception.getMessage(), exception);
             }
-            
+
             sb.setLength(0);
         }
     }

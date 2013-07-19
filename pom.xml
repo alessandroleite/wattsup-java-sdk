@@ -112,6 +112,14 @@
 			<version>${clamshell-api.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.clamshellcli</groupId>
+			<artifactId>clamshell-impl-default</artifactId>
+			<version>${clamshell-api.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

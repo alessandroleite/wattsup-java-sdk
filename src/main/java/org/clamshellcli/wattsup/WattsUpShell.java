@@ -20,32 +20,32 @@
  */
 package org.clamshellcli.wattsup;
 
-import org.clamshellcli.api.Command;
+import java.io.File;
+
+import org.clamshellcli.api.Configurator;
 import org.clamshellcli.api.Context;
+import org.clamshellcli.api.IOConsole;
+import org.clamshellcli.api.Shell;
 
-public class ConfigurationCommand implements Command
+public class WattsUpShell implements Shell
 {
-    /**
-     * 
-     */
-    private static final Descriptor COMMAND_DESCRIPTOR = new CommandDescriptor("config", "Define or read the parameter of the device.",
-            "config [port:<Serial Port name>]", new Arg("s", "Shows the parameters of the meter."), new Arg("d",
-                    "Defines the parameters of the meter."));
-
     @Override
-    public void plug(Context ctx)
+    public void exec(Context ctx)
     {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object execute(Context ctx)
+    public void plug(Context plug)
     {
-        return null;
-    }
-
-    @Override
-    public Descriptor getDescriptor()
-    {
-        return COMMAND_DESCRIPTOR;
+        IOConsole console = plug.getIoConsole();
+        if (console == null)
+        {
+            throw new RuntimeException(String.format(
+                    "%nUnable to find required IOConsole component in" + " plugins directory [%s]." + "Exiting...%n",
+                    ((File) plug.getValue(Configurator.KEY_CONFIG_PLUGINSDIR)).getName()));
+        }
+        // launch console
+        console.plug(plug);
     }
 }
