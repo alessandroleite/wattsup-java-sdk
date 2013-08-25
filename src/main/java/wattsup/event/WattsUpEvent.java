@@ -57,18 +57,18 @@ public abstract class WattsUpEvent<T> extends EventObject
         DISCONNECT, 
         
         /**
-         * Signal when the meter stop logging.
+         * Signal when the meter logging stop.
          */
         STOP_LOGGING;
     }
 
     /**
-     * The values associated/returned with the event.
+     * The value associated with an event.
      */
     private final T value_;
 
     /**
-     * The type of event.
+     * The event type.
      */
     private final EventType type_;
 
@@ -116,11 +116,11 @@ public abstract class WattsUpEvent<T> extends EventObject
     public abstract void processListener(WattsUpListener listener);
 
     /**
-     * Returns <code>true</code> if this {@link WattsUpListener} is an instance of a listener class that this event supports.
+     * Returns <code>true</code> if this {@link WattsUpListener} is an instance of a listener class supported by this event.
      * 
      * @param listener
      *            The {@link WattsUpListener} instance to evaluate.
-     * @return <code>true</code> if this {@link WattsUpListener} is an instance of a listener class that this event supports.
+     * @return <code>true</code> if this {@link WattsUpListener} is a type expected by this event.
      */
     public abstract boolean isAppropriateListener(WattsUpListener listener);
 }
