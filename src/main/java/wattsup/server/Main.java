@@ -18,24 +18,19 @@
  *     Contributors:
  *         Alessandro Ferreira Leite - the initial implementation.
  */
-package wattsup.console;
+package wattsup.server;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import wattsup.data.WattsUpConfig;
 import wattsup.event.WattsUpDisconnectEvent;
 import wattsup.listener.WattsUpDisconnectListener;
-import wattsup.listener.impl.ExportCsvListener;
 import wattsup.meter.WattsUp;
 
 public final class Main
 {
-
     /**
-     * Constructor.
+     * Private constructor to avoid instance of this class.
      */
     private Main()
     {
@@ -43,6 +38,8 @@ public final class Main
     }
 
     /**
+     * Starts a server bound to the port given the system property <em>wattsup.server.port</em> or in the default port: 9090.
+     * 
      * @param args
      *            The serial port where the meter is connected.
      * @throws IOException
@@ -58,24 +55,20 @@ public final class Main
         WattsUp meter = new WattsUp(new WattsUpConfig().withPort(args[0]).scheduleDuration(
                 Integer.valueOf(System.getProperty("measure.duration", "0"))));
 
-        OutputStream out = System.out;
-
-        final String exportFilePath = System.getProperty("export.file.path");
-        if (exportFilePath != null && !exportFilePath.isEmpty())
-        {
-            out = new FileOutputStream(new File(exportFilePath));
-        }
+        final int port = Integer.valueOf(System.getProperty("wattsup.server.port", "9090"));
+        final WattsUpServer server = new WattsUpServer(port, meter);
 
         meter.registerListener(new WattsUpDisconnectListener()
         {
             @Override
             public void onDisconnect(WattsUpDisconnectEvent event)
             {
+                server.stop();
                 System.exit(0);
             }
         });
 
-        meter.registerListener(new ExportCsvListener(out));
+        new Thread(server).start();
         meter.connect();
     }
 }
