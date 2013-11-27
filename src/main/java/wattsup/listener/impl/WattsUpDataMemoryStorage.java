@@ -18,37 +18,38 @@
  *     Contributors:
  *         Alessandro Ferreira Leite - the initial implementation.
  */
-package wattsup.event;
+package wattsup.listener.impl;
 
-import wattsup.listener.WattsUpConnectionListener;
-import wattsup.listener.WattsUpListener;
+import java.util.Map;
 
-public class WattsUpConnectedEvent extends WattsUpEvent<Void>
+import wattsup.data.WattsUpPacket;
+import wattsup.event.WattsUpDataAvailableEvent;
+import wattsup.listener.WattsUpDataAvailableListener;
+
+public class WattsUpDataMemoryStorage implements WattsUpDataAvailableListener
 {
     /**
-     * Serial code version <code>serialVersionUID</code> for serialization.
+     * 
      */
-    private static final long serialVersionUID = 9162190000759203691L;
+    private final Map<Long, WattsUpPacket> storage_;
 
     /**
-     * Creates {@link WattsUpConnectedEvent} instance assigned the event source.
-     *  
-     * @param source The event source.
+     * Creates a new {@link WattsUpDataMemoryStorage} assigned it a storage.
+     * 
+     * @param storage
+     *            The storage to insert the data.
      */
-    public WattsUpConnectedEvent(Object source)
+    public WattsUpDataMemoryStorage(Map<Long, WattsUpPacket> storage)
     {
-        super(source, wattsup.event.WattsUpEvent.EventType.CONNECT, null);
+        this.storage_ = storage;
     }
 
     @Override
-    public void processListener(WattsUpListener listener)
+    public void processDataAvailable(WattsUpDataAvailableEvent event)
     {
-        ((WattsUpConnectionListener) listener).onConnected(this);
-    }
-
-    @Override
-    public boolean isAppropriateListener(WattsUpListener listener)
-    {
-        return listener instanceof WattsUpConnectionListener;
+        for (WattsUpPacket value : event.getValue())
+        {
+            storage_.put(value.getTime(), value);
+        }
     }
 }

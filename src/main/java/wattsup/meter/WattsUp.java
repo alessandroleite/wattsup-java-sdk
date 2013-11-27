@@ -107,7 +107,7 @@ public final class WattsUp
     private final List<WattsUpListener> listeners_ = new LinkedList<>();
 
     /**
-     * Cache with the data with the mapping of event, listener and method.
+     * Cache with the mapping of event, listener and its method to be executed when a given event happens.
      */
     private final Map<Class<WattsUpEvent<?>>, WattsUpEventInfo> eventListenerMap_ = new WeakHashMap<>();
 
@@ -223,6 +223,7 @@ public final class WattsUp
             {
                 this.reset();
             }
+            
             notify(new WattsUpConnectedEvent(this));
             this.connected_ = true;
         }

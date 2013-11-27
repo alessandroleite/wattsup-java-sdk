@@ -20,12 +20,13 @@
  */
 package wattsup.data;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 import wattsup.data.WattsUpConfig.Delimiter;
 
-public final class WattsUpPacket
+public final class WattsUpPacket implements Serializable
 {
     /**
      * The number of field defined by the power meter.

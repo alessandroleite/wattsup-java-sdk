@@ -20,15 +20,33 @@
  */
 package wattsup.server;
 
-public enum ServerCommandType
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+
+import wattsup.data.WattsUpPacket;
+import wattsup.listener.impl.ExportCsvListener;
+import wattsup.meter.WattsUp;
+
+public final class SyncWorker extends AbstractWorker
 {
     /**
-     * 
+     * @param id
+     *            This worker id.
+     * @param wattsUp
+     *            The reference to the {@link WattsUp} to read the measurements.
+     * @param out
+     *            Output to write the measurements.
      */
-    CONNECT, 
-    
-    /**
-     * 
-     */
-    DISCONNECT;
+    public SyncWorker(UUID id, WattsUp wattsUp, OutputStream out)
+    {
+        super(id, wattsUp, new ExportCsvListener(out));
+    }
+
+    @Override
+    public Map<Long, WattsUpPacket> getData()
+    {
+        return Collections.emptyMap();
+    }
 }

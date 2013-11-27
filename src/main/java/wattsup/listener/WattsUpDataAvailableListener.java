@@ -26,7 +26,7 @@ public interface WattsUpDataAvailableListener extends WattsUpListener
 {
     /***
      * @param event
-     *            The {@link WattsUpDataAvailableEvent} event with the data available in the meter.
+     *            A {@link WattsUpDataAvailableEvent} reference with data.
      */
     void processDataAvailable(WattsUpDataAvailableEvent event);
 

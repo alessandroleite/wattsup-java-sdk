@@ -73,14 +73,14 @@ public abstract class WattsUpEvent<T> extends EventObject
     private final EventType type_;
 
     /**
-     * Creates a {@link WattsUpEvent} of the given type.
+     * Creates a {@link WattsUpEvent}.
      * 
      * @param source
      *            The source of this event.
      * @param type
-     *            The event's type.
+     *            This event type.
      * @param value
-     *            The value(s) associated with this event.
+     *            The values associated with this event.
      */
     public WattsUpEvent(Object source, EventType type, T value)
     {

@@ -20,47 +20,40 @@
  */
 package wattsup.server;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import wattsup.data.WattsUpPacket;
+import wattsup.listener.impl.WattsUpDataMemoryStorage;
+import wattsup.meter.WattsUp;
 
-public interface Worker extends Runnable
+public final class AsyncWorker extends AbstractWorker
 {
+    /**
+     * Reference for the WattsUp server storage.
+     */
+    private final Map<Long, WattsUpPacket> storage_;
 
     /**
-     * Return the worker's id.
-     * 
-     * @return The worker's id.
+     * @param id
+     *            This worker id.
+     * @param wattsUp
+     *            The reference to the {@link WattsUp} to read the measurements.
+     * @param storage
+     *            Reference for the WattsUp storage.
      */
-    UUID getId();
+    public AsyncWorker(UUID id, WattsUp wattsUp, Map<Long, WattsUpPacket> storage)
+    {
+        super(id, wattsUp, new WattsUpDataMemoryStorage(Objects.requireNonNull(storage)));
+        this.storage_ = storage;
+    }
 
-    /**
-     * Returns the {@link Worker}'s state.
-     * 
-     * @return The worker's state.
-     */
-    WorkerState getState();
-
-    /**
-     * Returns a read-only view with the data of this worker. The key is the time in milliseconds of the {@link WattsUpPacket}.
-     * 
-     * @return A read-only view with the data of this worker.
-     */
-    Map<Long, WattsUpPacket> getData();
-
-    /**
-     * 
-     */
-    void start();
-
-    /**
-     * Stop this work but it's still alive.
-     */
-    void stop();
-
-    /**
-     * 
-     */
-    void finish();
+    @Override
+    public Map<Long, WattsUpPacket> getData()
+    {
+        return Collections.unmodifiableMap(new HashMap<Long, WattsUpPacket>(storage_));
+    }
 }

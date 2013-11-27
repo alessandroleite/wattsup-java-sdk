@@ -92,12 +92,12 @@ public class ExportCsvListener implements WattsUpDataAvailableListener
     }
 
     /**
-     * Inserts the header into the output file. The header is the name of each field including only the letters [a-z,A-Z].
+     * Inserts the header into the output file. The header is the name of each field including only letters [a-z,A-Z].
      * 
      * @param data
-     *            The reference to the {@link WattsUpPacket} that has the fields of the CSV's file.
+     *            The reference to the {@link WattsUpPacket} that has the fields for the CSV's file.
      * @param output
-     *            The reference to {@link StringBuffer} to append a line with the reader.
+     *            A {@link StringBuffer} to append a line with the reader.
      */
     private void header(final WattsUpPacket data, final StringBuilder output)
     {

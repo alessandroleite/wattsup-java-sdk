@@ -20,7 +20,7 @@
  */
 package wattsup.data;
 
-public final class Field implements Cloneable
+public final class Field implements Cloneable, java.io.Serializable
 {
     /**
      * The name of the field. Might not be <code>null</code> or empty.

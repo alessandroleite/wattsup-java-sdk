@@ -18,37 +18,17 @@
  *     Contributors:
  *         Alessandro Ferreira Leite - the initial implementation.
  */
-package wattsup.event;
+package wattsup.server;
 
-import wattsup.listener.WattsUpConnectionListener;
-import wattsup.listener.WattsUpListener;
-
-public class WattsUpConnectedEvent extends WattsUpEvent<Void>
+public enum CommandType
 {
     /**
-     * Serial code version <code>serialVersionUID</code> for serialization.
+     * 
      */
-    private static final long serialVersionUID = 9162190000759203691L;
-
+    START, 
+    
     /**
-     * Creates {@link WattsUpConnectedEvent} instance assigned the event source.
-     *  
-     * @param source The event source.
+     * 
      */
-    public WattsUpConnectedEvent(Object source)
-    {
-        super(source, wattsup.event.WattsUpEvent.EventType.CONNECT, null);
-    }
-
-    @Override
-    public void processListener(WattsUpListener listener)
-    {
-        ((WattsUpConnectionListener) listener).onConnected(this);
-    }
-
-    @Override
-    public boolean isAppropriateListener(WattsUpListener listener)
-    {
-        return listener instanceof WattsUpConnectionListener;
-    }
+    END;
 }

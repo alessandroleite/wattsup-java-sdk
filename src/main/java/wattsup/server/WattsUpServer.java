@@ -23,8 +23,6 @@ package wattsup.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import wattsup.meter.WattsUp;
 
@@ -36,7 +34,7 @@ public final class WattsUpServer implements Runnable
     private final int port_;
 
     /**
-     * 
+     * A flag to indicate if the server was started.
      */
     private volatile boolean started_;
 
@@ -46,24 +44,20 @@ public final class WattsUpServer implements Runnable
     private ServerSocket server_;
 
     /**
-     * The thread pool.
+     * 
      */
-    private final ExecutorService threadPool_ = Executors.newFixedThreadPool(10);
-
-    /**
-     * The reference to the {@link WattsUp} to read the data.
-     */
-    private final WattsUp wattsUp_;
+    private final RequestHandler requestHandler_;
 
     /**
      * @param port
      *            The port to initialize the server. A port number of 0 means that the port number is automatically allocated.
-     * @param wattsUp The {@link WattsUp} reference to read the power measurements.
+     * @param wattsUp
+     *            The {@link WattsUp} reference to read the power measurements.
      */
     public WattsUpServer(int port, WattsUp wattsUp)
     {
         this.port_ = port;
-        this.wattsUp_ = wattsUp;
+        this.requestHandler_ = new RequestHandler(wattsUp);
     }
 
     @Override
@@ -76,7 +70,7 @@ public final class WattsUpServer implements Runnable
             try
             {
                 Socket client = this.server_.accept();
-                this.threadPool_.execute(new Worker(client, wattsUp_));
+                requestHandler_.handle(client);
             }
             catch (IOException e)
             {
@@ -87,8 +81,11 @@ public final class WattsUpServer implements Runnable
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        this.threadPool_.shutdown();
+        
+        this.requestHandler_.shutdown();
     }
+
+    
 
     /**
      * Stop this server.

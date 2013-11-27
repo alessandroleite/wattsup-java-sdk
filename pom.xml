@@ -19,17 +19,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.source.version>1.7</java.source.version>
-		
+
 		<internal.snapshots.repo.path>file://${project.basedir}/../maven-repo/snapshots</internal.snapshots.repo.path>
 		<internal.release.repo.path>file://${project.basedir}/../maven-repo/releases</internal.release.repo.path>
 		<clamshellcli.repo>http://s3.amazonaws.com/repo.clamshellcli.org/release/</clamshellcli.repo>
-		
+
 		<license-header-file>${basedir}/license-header.txt</license-header-file>
 		<checkstyle.file>${project.basedir}/checkstyle.xml</checkstyle.file>
 		<jfreechart.version>1.0.14</jfreechart.version>
 		<nrjavaserial.version>3.8.8</nrjavaserial.version>
 		<jedis.version>2.0.0</jedis.version>
 		<clamshell-api.version>0.5.2</clamshell-api.version>
+
+		<mapdb.version>0.9.7</mapdb.version>
 	</properties>
 
 
@@ -105,21 +107,27 @@
 			<version>${clamshell-api.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.clamshellcli</groupId>
 			<artifactId>clamshell-impl-core</artifactId>
 			<version>${clamshell-api.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.clamshellcli</groupId>
 			<artifactId>clamshell-impl-default</artifactId>
 			<version>${clamshell-api.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>${mapdb.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
