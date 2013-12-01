@@ -4,7 +4,7 @@ wattsup-java-sdk
 What is it ?
 ------------
 
-A Java application to communicate with the [Watts up?](https://www.wattsupmeters.com/secure/products.php?pn=0&wai=0&more=1) and read the available power measurements. The communication is based on the protocol described in [https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf](https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf)
+A Java application to communicate with the [Watts up?](https://www.wattsupmeters.com/secure/products.php?pn=0&wai=0&more=1) and read the available power measurements. The communication is based on the protocol described on [https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf](https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf)
 
 Usage
 ------
@@ -41,7 +41,7 @@ Here is a class that connect to the power meter during three minutes and print t
 
 ### Running:
 
-	java -cp lib/nrjavaserial-3.8.8.jar wattsup.meter.test.WattsUpTest /dev/ttyUSB0
+	java -cp lib/nrjavaserial-3.8.8.jar wattsup.jsdk.example.test.WattsUpTest /dev/ttyUSB0
    
 Dependencies
 --------------
