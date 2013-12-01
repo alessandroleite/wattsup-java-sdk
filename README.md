@@ -1,4 +1,4 @@
-wattsup
+wattsup-java-sdk
 =======
 
 What is it ?
