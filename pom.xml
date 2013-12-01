@@ -9,36 +9,25 @@
 		<version>7</version>
 	</parent>
 
-	<groupId>wattsup</groupId>
-	<artifactId>wattsupj</artifactId>
+	<groupId>wattsup-java-sdk</groupId>
+	<artifactId>wattsup-java-sdk-pom</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>wattsupj</name>
+	<packaging>pom</packaging>
+	<name>wattsup-java-sdk</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.source.version>1.7</java.source.version>
-
-		<internal.snapshots.repo.path>file://${project.basedir}/../maven-repo/snapshots</internal.snapshots.repo.path>
-		<internal.release.repo.path>file://${project.basedir}/../maven-repo/releases</internal.release.repo.path>
-		<clamshellcli.repo>http://s3.amazonaws.com/repo.clamshellcli.org/release/</clamshellcli.repo>
-
-		<license-header-file>${basedir}/license-header.txt</license-header-file>
+		<license-header-file>${basedir}/LICENSE</license-header-file>
 		<checkstyle.file>${project.basedir}/checkstyle.xml</checkstyle.file>
-		<jfreechart.version>1.0.14</jfreechart.version>
-		<nrjavaserial.version>3.8.8</nrjavaserial.version>
-		<jedis.version>2.0.0</jedis.version>
-		<clamshell-api.version>0.5.2</clamshell-api.version>
-
-		<mapdb.version>0.9.7</mapdb.version>
 	</properties>
 
 
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.</name>
-			<url>http://www.fsf.org/licensing/licenses/lgpl.html</url>
+			<url>http://www.fsf.org/licensing/licenses/gpl.html</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -57,18 +46,10 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>clamshellcli.repo</id>
-			<name>Clamshell-Cli Repository</name>
-			<url>${clamshellcli.repo}</url>
-		</repository>
-	</repositories>
-
 	<scm>
-		<connection>scm:git:ssh://github.com/alessandroleite/wattsup.git</connection>
-		<developerConnection>scm:git:git@github.com:alessandroleite/wattsup.git</developerConnection>
-		<url>https://github.com/alessandroleite/wattsup</url>
+		<connection>scm:git:ssh://github.com/alessandroleite/wattsup-java-sdk.git</connection>
+		<developerConnection>scm:git:git@github.com:alessandroleite/wattsup-java-sdk.git</developerConnection>
+		<url>https://github.com/alessandroleite/wattsup-java-sdk</url>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -79,159 +60,118 @@
 		</developer>
 	</developers>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>jfreechart</artifactId>
-			<version>${jfreechart.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.neuronrobotics</groupId>
-			<artifactId>nrjavaserial</artifactId>
-			<version>${nrjavaserial.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.clamshellcli</groupId>
-			<artifactId>clamshell-api</artifactId>
-			<version>${clamshell-api.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.clamshellcli</groupId>
-			<artifactId>clamshell-impl-core</artifactId>
-			<version>${clamshell-api.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.clamshellcli</groupId>
-			<artifactId>clamshell-impl-default</artifactId>
-			<version>${clamshell-api.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mapdb</groupId>
-			<artifactId>mapdb</artifactId>
-			<version>${mapdb.version}</version>
-		</dependency>
-
-	</dependencies>
+	<modules>
+		<module>wattsup-jsdk-client</module>
+		<module>wattsup-jsdk-console</module>
+		<module>wattsup-jsdk-core</module>
+		<module>wattsup-jsdk-server</module>
+		<module>wattsup-jsdk-ui</module>
+	</modules>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.10</version>
-				<configuration>
-					<configLocation>${checkstyle.file}</configLocation>
-					<headerLocation>${license-header-file}</headerLocation>
-				</configuration>
-			</plugin>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.10</version>
+					<configuration>
+						<configLocation>${checkstyle.file}</configLocation>
+						<headerLocation>${license-header-file}</headerLocation>
+					</configuration>
+				</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<source>${java.source.version}</source>
-					<target>${java.source.version}</target>
-					<showDeprecation>true</showDeprecation>
-					<XaddSerialVersionUID>true</XaddSerialVersionUID>
-					<compilerArgument>-Xlint:all</compilerArgument>
-				</configuration>
-			</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<source>${java.source.version}</source>
+						<target>${java.source.version}</target>
+						<showDeprecation>true</showDeprecation>
+						<XaddSerialVersionUID>true</XaddSerialVersionUID>
+						<compilerArgument>-Xlint:all</compilerArgument>
+					</configuration>
+				</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<inherited>true</inherited>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+					<inherited>true</inherited>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.9</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.9.0</version>
-				<configuration>
-					<header>${license-header-file}</header>
-					<excludes>
-						<exclude>License.txt</exclude>
-						<exclude>**/.so</exclude>
-						<exclude>**/README.md</exclude>
-						<exclude>**/travis.yml</exclude>
-						<exclude>**/checkstyle.xml</exclude>
-						<exclude>**/.checkstyle</exclude>
-					</excludes>
-					<strictCheck>true</strictCheck>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<additionalProjectnatures>
-						<projectnature>org.maven.ide.eclipse.maven2Nature</projectnature>
-						<projectnature>org.eclipse.jem.workbench.JavaEMFNature</projectnature>
-						<projectnature>org.eclipse.wst.jsdt.core.jsNature </projectnature>
-						<projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
-					</additionalProjectnatures>
-					<additionalBuildcommands>
-						<buildcommand>org.maven.ide.eclipse.maven2Builder</buildcommand>
-						<buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
-						<forceRecheck>true</forceRecheck>
-					</additionalBuildcommands>
-					<additionalConfig>
-						<file>
-							<name>.checkstyle</name>
-							<content>
+				<plugin>
+					<groupId>com.mycila.maven-license-plugin</groupId>
+					<artifactId>maven-license-plugin</artifactId>
+					<version>1.9.0</version>
+					<configuration>
+						<header>${license-header-file}</header>
+						<excludes>
+							<exclude>License.txt</exclude>
+							<exclude>**/.so</exclude>
+							<exclude>**/README.md</exclude>
+							<exclude>**/travis.yml</exclude>
+							<exclude>**/checkstyle.xml</exclude>
+							<exclude>**/.checkstyle</exclude>
+							<exclude>**/gpl.txt</exclude>
+						</excludes>
+						<strictCheck>true</strictCheck>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>format</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>2.9</version>
+					<configuration>
+						<additionalProjectnatures>
+							<projectnature>org.maven.ide.eclipse.maven2Nature</projectnature>
+							<projectnature>org.eclipse.jem.workbench.JavaEMFNature</projectnature>
+							<projectnature>org.eclipse.wst.jsdt.core.jsNature </projectnature>
+							<projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
+						</additionalProjectnatures>
+						<additionalBuildcommands>
+							<buildcommand>org.maven.ide.eclipse.maven2Builder</buildcommand>
+							<buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
+							<forceRecheck>true</forceRecheck>
+						</additionalBuildcommands>
+						<additionalConfig>
+							<file>
+								<name>.checkstyle</name>
+								<content>
 							  <![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 							<fileset-config file-format-version="1.2.0" simple-config="true" sync-formatter="true">
 							  <local-check-config name="${project.groupId}-checkstyle" location="${checkstyle.file}" type="external" description="">
@@ -242,50 +182,17 @@
 							  </fileset>
 							</fileset-config>
 					]]>
-							</content>
-						</file>
-					</additionalConfig>
-					<useProjectReferences>true</useProjectReferences>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<projectNameTemplate>[groupId]-[artifactId]-[version]</projectNameTemplate>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Build>${buildNumber}</Implementation-Build>
-							<mode>development</mode>
-						</manifestEntries>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>${project.finalName}</finalName>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-							<attach>true</attach>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+								</content>
+							</file>
+						</additionalConfig>
+						<useProjectReferences>true</useProjectReferences>
+						<downloadSources>true</downloadSources>
+						<downloadJavadocs>true</downloadJavadocs>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

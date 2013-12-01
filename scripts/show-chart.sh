@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-#     WattsUp-J is a Java application to interact with the Watts up? power meter.
-#     Copyright (C) 2013  Contributors
+#     Copyright (C) 2013 Contributors
 #
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -15,9 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
-#
-#     Contributors:
-#         Alessandro Ferreira Leite - the initial implementation.
 #
 
 java -cp .:../target/wattsupj-1.0.0-SNAPSHOT.jar -Dmeasure.duration=$1 -Dexport.file.path=$2 wattsup.ui.Main $3
