@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import wattsup.jsdk.core.data.WattsUpConfig;
 import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.event.WattsUpConnectedEvent;
@@ -41,6 +42,7 @@ import wattsup.jsdk.core.event.WattsUpMemoryCleanEvent;
 import wattsup.jsdk.core.event.WattsUpStopLoggingEvent;
 import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.listener.WattsUpListener;
+
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CLEAR_MEMORY;
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CONFIGURE_EXTERNAL_LOGGING_INTERVAL;
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CONFIGURE_INTERNAL_LOGGING_INTERVAL;
@@ -52,8 +54,8 @@ import static wattsup.jsdk.core.data.command.WattsUpCommand.STOP_LOGGING;
  * 
  * <ul>
  * <li>Creates an instance. Call the constructor {@link #WattsUp(WattsUpConfig)};</li>
- * <li>Register a {@link wattsup.jsdk.core.listener.WattsUpDataAvailableListener} listener to be notified when data (measure) are available. Call the method
- * {@link #registerListener(WattsUpListener)}</li>
+ * <li>Register a {@link wattsup.jsdk.core.listener.WattsUpDataAvailableListener} listener to be notified when data (measure) are available. Call the
+ * method {@link #registerListener(WattsUpListener)}</li>
  * <li>Connect to the meter. Call method {@link #connect()};</li>
  * <li>Disconnect after you finish the work/experiment. Call the method {@link #disconnect()}.</li>
  * </ul>
@@ -89,12 +91,12 @@ import static wattsup.jsdk.core.data.command.WattsUpCommand.STOP_LOGGING;
  */
 public final class WattsUp
 {
- 
+
     /**
      * The logging strategy of this class.
      */
     private static final Logger LOG = Logger.getLogger(WattsUp.class.getName());
-    
+
     /**
      * The listeners registered for this {@link WattsUp} meter.
      */
@@ -115,7 +117,7 @@ public final class WattsUp
      * the one given by the method {@link #configureExternalLoggingInterval(int)}.
      */
     private ScheduledExecutorService scheduler_;
-    
+
     /**
      * The executor to notify the listener about the events.
      */
@@ -217,7 +219,7 @@ public final class WattsUp
             {
                 this.reset();
             }
-            
+
             notify(new WattsUpConnectedEvent(this));
             this.connected_ = true;
         }
@@ -264,23 +266,23 @@ public final class WattsUp
 
             this.configured_ = false;
             this.connected_ = false;
-            
+
             notify(new WattsUpDisconnectEvent(this, System.currentTimeMillis()));
-            
+
             List<Runnable> waitingTasks = null;
-            
+
             try
             {
                 if (!listenerNotifyExecutor_.awaitTermination(5, SECONDS))
                 {
-                     waitingTasks = listenerNotifyExecutor_.shutdownNow();
+                    waitingTasks = listenerNotifyExecutor_.shutdownNow();
                 }
             }
             catch (InterruptedException ie)
             {
                 waitingTasks = listenerNotifyExecutor_.shutdownNow();
             }
-            
+
             if (LOG.isLoggable(Level.INFO) && waitingTasks != null && !waitingTasks.isEmpty())
             {
                 LOG.info(String.format("There was/were %s events(s) waiting to be notified!", waitingTasks.size()));
@@ -437,7 +439,8 @@ public final class WattsUp
          * @param listener
          *            The reference to the {@link WattsUpListener} to find the method to be executed for the {@code event}. Might not be
          *            <code>null</code>.
-         * @param <T> The event's data type.
+         * @param <T>
+         *            The event's data type.
          * @return The {@link Method} of {@code listener} that has just {@code event} as parameter. The method is configured to be accessible.
          */
         private <T> Method getEventMethodFor(final WattsUpEvent<T> event, final WattsUpListener listener)
@@ -461,7 +464,7 @@ public final class WattsUp
             return method;
         }
     }
-    
+
     private class WattsUpStreamReader implements Runnable
     {
         @Override

@@ -109,7 +109,7 @@ public enum WattsUpCommand
     private final boolean cleanMemory_;
 
     /**
-     * Flag to indicate if there is response for the command execution.
+     * Flag to indicate if there is a response for the command execution.
      */
     private final boolean waitResponse_;
 

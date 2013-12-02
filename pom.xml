@@ -159,13 +159,14 @@
 					<configuration>
 						<additionalProjectnatures>
 							<projectnature>org.maven.ide.eclipse.maven2Nature</projectnature>
+							<projectnature>org.eclipse.m2e.core.maven2Nature</projectnature>
 							<projectnature>org.eclipse.jem.workbench.JavaEMFNature</projectnature>
-							<projectnature>org.eclipse.wst.jsdt.core.jsNature </projectnature>
 							<projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
 						</additionalProjectnatures>
 						<additionalBuildcommands>
 							<buildcommand>org.maven.ide.eclipse.maven2Builder</buildcommand>
 							<buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
+							<buildcommand>org.eclipse.m2e.core.maven2Builder</buildcommand>
 							<forceRecheck>true</forceRecheck>
 						</additionalBuildcommands>
 						<additionalConfig>
@@ -185,6 +186,9 @@
 								</content>
 							</file>
 						</additionalConfig>
+						<classpathContainers>
+							<classpathContainer>org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER</classpathContainer>
+						</classpathContainers>
 						<useProjectReferences>true</useProjectReferences>
 						<downloadSources>true</downloadSources>
 						<downloadJavadocs>true</downloadJavadocs>

@@ -25,9 +25,10 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 import gnu.io.NRSerialPort;
+
 import wattsup.jsdk.core.data.WattsUpConfig;
-import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.data.WattsUpConfig.Delimiter;
+import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.data.command.WattsUpCommand;
 
 class WattsUpConnection implements Closeable

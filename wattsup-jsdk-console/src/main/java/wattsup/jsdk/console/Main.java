@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import wattsup.jsdk.core.data.WattsUpConfig;
 import wattsup.jsdk.core.event.WattsUpDisconnectEvent;
 import wattsup.jsdk.core.listener.WattsUpDisconnectListener;
-import wattsup.jsdk.core.listener.impl.ExportCsvListener;
+import wattsup.jsdk.core.listener.impl.DefaultWattsUpDataAvailableListener;
 import wattsup.jsdk.core.meter.WattsUp;
 
 public final class Main
@@ -71,7 +71,7 @@ public final class Main
             }
         });
 
-        meter.registerListener(new ExportCsvListener(out));
+        meter.registerListener(new DefaultWattsUpDataAvailableListener());
         meter.connect();
     }
 }

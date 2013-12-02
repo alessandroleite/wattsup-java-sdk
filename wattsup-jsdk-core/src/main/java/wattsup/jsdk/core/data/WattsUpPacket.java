@@ -43,6 +43,12 @@ public final class WattsUpPacket implements Serializable
      * The labels defined by the power meter.
      */
     private static final String[] LABELS = new String[NUM_FIELDS];
+    
+    
+    /**
+     * This packet id.
+     */
+    private final ID id_;
 
     /**
      * The command for the packet.
@@ -103,6 +109,7 @@ public final class WattsUpPacket implements Serializable
     {
         this.data_ = record;
         this.time_ = time;
+        this.id_ = ID.fromLong(time);
     }
 
     /**
@@ -185,6 +192,16 @@ public final class WattsUpPacket implements Serializable
         }
 
         return packets.toArray(new WattsUpPacket[packets.size()]);
+    }
+    
+    
+
+    /**
+     * @return the id
+     */
+    public ID getId()
+    {
+        return id_;
     }
 
     /**

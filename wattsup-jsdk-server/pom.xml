@@ -9,7 +9,6 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>wattsup-java-sdk</groupId>
 	<artifactId>wattsup-java-sdk-server</artifactId>
 	<packaging>jar</packaging>
 

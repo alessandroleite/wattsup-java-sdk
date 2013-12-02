@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import wattsup.jsdk.core.data.WattsUpPacket;
-import wattsup.jsdk.core.listener.impl.WattsUpDataMemoryStorage;
+import wattsup.jsdk.core.listener.impl.DefaultWattsUpMemory;
 import wattsup.jsdk.core.meter.WattsUp;
 
 public final class AsyncWorker extends AbstractWorker
@@ -43,7 +43,7 @@ public final class AsyncWorker extends AbstractWorker
      */
     public AsyncWorker(UUID id, WattsUp wattsUp, Map<Long, WattsUpPacket> storage)
     {
-        super(id, wattsUp, new WattsUpDataMemoryStorage(Objects.requireNonNull(storage)));
+        super(id, wattsUp, new DefaultWattsUpMemory(Objects.requireNonNull(storage)));
         this.storage_ = storage;
     }
 
