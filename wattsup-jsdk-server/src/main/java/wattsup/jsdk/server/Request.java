@@ -18,19 +18,20 @@ package wattsup.jsdk.server;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
+
+import wattsup.jsdk.core.data.ID;
 
 public class Request implements Serializable
 {
     /**
      * Serial code version <code>serialVersionUID</code> for serialization.
      */
-    private static final long serialVersionUID = 1234934055787004029L;
+    private static final long serialVersionUID = 3037120095297869152L;
 
     /**
      * The request id. It must not be <code>null</code>.
      */
-    private UUID id_;
+    private ID id_;
 
     /**
      * 
@@ -53,7 +54,7 @@ public class Request implements Serializable
      * @param id
      *            The ID to assign. Might not be <code>null</code>.
      */
-    public Request(UUID id)
+    public Request(ID id)
     {
         this.id_ = Objects.requireNonNull(id);
     }
@@ -63,7 +64,7 @@ public class Request implements Serializable
      */
     public Request()
     {
-        this(UUID.randomUUID());
+        this(ID.randomID());
     }
 
     /**
@@ -94,7 +95,7 @@ public class Request implements Serializable
      *            This request's ID. Might not be <code>null</code>.
      * @return This instance with the new ID value.
      */
-    public Request withId(UUID id)
+    public Request withId(ID id)
     {
         this.id_ = Objects.requireNonNull(id);
         return this;
@@ -128,7 +129,7 @@ public class Request implements Serializable
     /**
      * @return the id
      */
-    public final UUID getId()
+    public final ID getId()
     {
         return id_;
     }

@@ -16,10 +16,10 @@
  */
 package wattsup.jsdk.server;
 
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.event.WattsUpDisconnectEvent;
 import wattsup.jsdk.core.listener.WattsUpDisconnectListener;
 import wattsup.jsdk.core.listener.WattsUpListener;
@@ -35,7 +35,7 @@ public abstract class AbstractWorker implements Worker
     /**
      * This worker id.
      */
-    private final UUID id_;
+    private final ID id_;
 
     /**
      * Reference to the power meter to read the data and send to this client.
@@ -66,7 +66,7 @@ public abstract class AbstractWorker implements Worker
      *            The listener to register in the {@link WattsUp}. Might not be <code>null</code>. By default this class register a
      *            {@link WattsUpDisconnectListener} to finish this work when the {@link WattsUp} disconnects.
      */
-    public AbstractWorker(UUID id, WattsUp wattsUp, WattsUpListener... listeners)
+    public AbstractWorker(ID id, WattsUp wattsUp, WattsUpListener... listeners)
     {
         this.id_ = id;
         this.wattsUp_ = wattsUp;
@@ -148,7 +148,7 @@ public abstract class AbstractWorker implements Worker
     }
 
     @Override
-    public UUID getId()
+    public ID getId()
     {
         return id_;
     }

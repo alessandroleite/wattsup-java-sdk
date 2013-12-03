@@ -16,14 +16,13 @@
  */
 package wattsup.jsdk.server;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
-import wattsup.jsdk.core.listener.impl.DefaultWattsUpMemory;
+import wattsup.jsdk.core.data.storage.Memory;
+import wattsup.jsdk.core.listener.impl.DefaultWattsUpDataAvailableListener;
 import wattsup.jsdk.core.meter.WattsUp;
 
 public final class AsyncWorker extends AbstractWorker
@@ -31,7 +30,7 @@ public final class AsyncWorker extends AbstractWorker
     /**
      * Reference for the WattsUp server storage.
      */
-    private final Map<Long, WattsUpPacket> storage_;
+    private final Memory<WattsUpPacket> memory_;
 
     /**
      * @param id
@@ -41,15 +40,22 @@ public final class AsyncWorker extends AbstractWorker
      * @param storage
      *            Reference for the WattsUp storage.
      */
-    public AsyncWorker(UUID id, WattsUp wattsUp, Map<Long, WattsUpPacket> storage)
+    public AsyncWorker(ID id, WattsUp wattsUp, Memory<WattsUpPacket> memory)
     {
-        super(id, wattsUp, new DefaultWattsUpMemory(Objects.requireNonNull(storage)));
-        this.storage_ = storage;
+        super(id, wattsUp, new DefaultWattsUpDataAvailableListener(memory));
+        this.memory_ = memory;
     }
 
     @Override
-    public Map<Long, WattsUpPacket> getData()
+    public Map<ID, WattsUpPacket> getData()
     {
-        return Collections.unmodifiableMap(new HashMap<Long, WattsUpPacket>(storage_));
+        Map<ID, WattsUpPacket> data = new HashMap<>();
+
+        for (WattsUpPacket packet : this.memory_.values())
+        {
+            data.put(packet.getId(), packet);
+        }
+
+        return data;
     }
 }

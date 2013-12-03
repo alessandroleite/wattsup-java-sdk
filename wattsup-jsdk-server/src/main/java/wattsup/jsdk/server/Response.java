@@ -17,19 +17,20 @@
 package wattsup.jsdk.server;
 
 import java.io.Serializable;
-import java.util.UUID;
+
+import wattsup.jsdk.core.data.ID;
 
 public class Response implements Serializable
 {
     /**
      * Serial code version <code>serialVersionUID</code> for serialization.
      */
-    private static final long serialVersionUID = 5002581119764808127L;
+    private static final long serialVersionUID = -6325563256519604244L;
 
     /**
      * Response's id.
      */
-    private UUID id_;
+    private ID id_;
 
     /**
      * The response's data.
@@ -42,7 +43,7 @@ public class Response implements Serializable
      * @param id
      *            Response'id. Might not be <code>null</code>.
      */
-    public Response(UUID id)
+    public Response(ID id)
     {
         this.id_ = id;
     }
@@ -62,7 +63,7 @@ public class Response implements Serializable
      *            Response's id. Might not be <code>null</code>.
      * @return This response with the given ID.
      */
-    public static Response newResponse(UUID id)
+    public static Response newResponse(ID id)
     {
         return new Response(id);
     }
@@ -73,7 +74,7 @@ public class Response implements Serializable
      *            Response's id. Might not be <code>null</code>.
      * @return This response with the new ID value.
      */
-    public Response withId(UUID id)
+    public Response withId(ID id)
     {
         this.id_ = id;
         return this;
@@ -94,7 +95,7 @@ public class Response implements Serializable
     /**
      * @return the id
      */
-    public UUID getId()
+    public ID getId()
     {
         return id_;
     }

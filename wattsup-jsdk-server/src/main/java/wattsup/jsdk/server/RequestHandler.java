@@ -23,19 +23,16 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-
-import wattsup.jsdk.core.data.WattsUpPacket;
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.meter.WattsUp;
+import wattsup.jsdk.server.memory.OffHeapMemory;
 
 public class RequestHandler
 {
@@ -56,17 +53,19 @@ public class RequestHandler
     /**
      * 
      */
-    private final Map<UUID, Worker> workers_ = new ConcurrentHashMap<UUID, Worker>();
+    private final Map<ID, Worker> workers_ = new ConcurrentHashMap<ID, Worker>();
 
     /**
      * The reference to the {@link WattsUp} to read the data.
      */
     private final WattsUp wattsUp_;
-
+    
     /**
      * 
      */
-    private final DB storage_;
+    private final OffHeapMemory memory_ = new OffHeapMemory();
+
+   
 
     /**
      * 
@@ -76,7 +75,6 @@ public class RequestHandler
     public RequestHandler(WattsUp wattsUp)
     {
         this.wattsUp_ = wattsUp;
-        storage_ = DBMaker.newDirectMemoryDB().compressionEnable().make();
     }
 
     /**
@@ -99,7 +97,7 @@ public class RequestHandler
         switch (request.getCommand())
         {
         case START:
-            worker = new AsyncWorker(request.getId(), this.wattsUp_, storage_.<Long, WattsUpPacket> getTreeMap(request.getName()));
+            worker = new AsyncWorker(request.getId(), this.wattsUp_, memory_.getRegion(request.getName()));
             schedule(worker);
             reply(client, request.getId(), Boolean.TRUE);
             break;
@@ -117,7 +115,7 @@ public class RequestHandler
                         reply(client, worker.getId(), (Serializable) worker.getData());
                     }
                 });
-                storage_.delete(request.getName());
+                memory_.freeRegion(request.getName());
             }
             break;
         default:
@@ -149,7 +147,7 @@ public class RequestHandler
      * @param value
      *            Response's value.
      */
-    private void reply(Socket client, UUID id, Serializable value)
+    private void reply(Socket client, ID id, Serializable value)
     {
         if (!client.isClosed())
         {

@@ -17,8 +17,8 @@
 package wattsup.jsdk.server;
 
 import java.util.Map;
-import java.util.UUID;
 
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
 
 public interface Worker extends Runnable
@@ -29,7 +29,7 @@ public interface Worker extends Runnable
      * 
      * @return The worker's id.
      */
-    UUID getId();
+    ID getId();
 
     /**
      * Returns the {@link Worker}'s state.
@@ -43,7 +43,7 @@ public interface Worker extends Runnable
      * 
      * @return A read-only view with the data of this worker.
      */
-    Map<Long, WattsUpPacket> getData();
+    Map<ID, WattsUpPacket> getData();
 
     /**
      * 

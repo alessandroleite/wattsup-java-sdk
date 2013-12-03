@@ -19,11 +19,13 @@ package wattsup.jsdk.server;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
-import java.util.UUID;
 
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
-import wattsup.jsdk.core.listener.impl.ExportCsvListener;
+import wattsup.jsdk.core.data.storage.impl.OutputStreamMemory;
+import wattsup.jsdk.core.listener.impl.DefaultWattsUpDataAvailableListener;
 import wattsup.jsdk.core.meter.WattsUp;
+import wattsup.jsdk.core.serialize.csv.CsvWattsUpPacketSerializer;
 
 public final class SyncWorker extends AbstractWorker
 {
@@ -35,13 +37,13 @@ public final class SyncWorker extends AbstractWorker
      * @param out
      *            Output to write the measurements.
      */
-    public SyncWorker(UUID id, WattsUp wattsUp, OutputStream out)
+    public SyncWorker(ID id, WattsUp wattsUp, OutputStream out)
     {
-        super(id, wattsUp, new ExportCsvListener(out));
+        super(id, wattsUp, new DefaultWattsUpDataAvailableListener(new OutputStreamMemory(new CsvWattsUpPacketSerializer(), out)));
     }
 
     @Override
-    public Map<Long, WattsUpPacket> getData()
+    public Map<ID, WattsUpPacket> getData()
     {
         return Collections.emptyMap();
     }

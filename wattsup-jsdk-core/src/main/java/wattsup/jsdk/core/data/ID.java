@@ -55,6 +55,17 @@ public final class ID implements Comparable<ID>, Serializable, Cloneable
     }
 
     /**
+     * 
+     * @param value
+     *            A {@link Long} that specifies a {@link ID}.
+     * @return A {@link ID} with the given value.
+     */
+    public static ID fromLong(long value)
+    {
+        return new ID(UUID.nameUUIDFromBytes(Long.toHexString(value).getBytes()));
+    }
+
+    /**
      * Creates a {@link ID} from the {@link String} standard representation as described in the toString() method.
      * 
      * @param value
@@ -67,14 +78,13 @@ public final class ID implements Comparable<ID>, Serializable, Cloneable
     }
 
     /**
+     * Static factory to create an {@link ID} using pseudo random number generator.
      * 
-     * @param value
-     *            A {@link Long} that specifies a {@link ID}.
-     * @return A {@link ID} with the given value.
+     * @return An {@link ID} generated with pseudo random number generator.
      */
-    public static ID fromLong(long value)
+    public static ID randomID()
     {
-        return new ID(UUID.nameUUIDFromBytes(Long.toHexString(value).getBytes()));
+        return new ID(UUID.randomUUID());
     }
 
     @Override
