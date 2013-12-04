@@ -14,36 +14,22 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.core.data;
+package wattsup.jsdk.remote.data;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-/**
- * 
- */
-public final class Sequence
+public enum CommandType
 {
     /**
+     * Starts a new measurement block.
      */
-    private AtomicLong source_ = new AtomicLong(0);
+    START,
 
     /**
-     * Returns the current value incremented by one.
-     * 
-     * @return The next sequence value.
+     * Get the data available.
      */
-    public Long nextValue()
-    {
-        return this.source_.incrementAndGet();
-    }
+    DUMP,
 
     /**
-     * Returns the current value.
-     * 
-     * @return The current value.
+     * Finalizes a measurement block.
      */
-    public Long currentValue()
-    {
-        return this.source_.get();
-    }
+    END;
 }

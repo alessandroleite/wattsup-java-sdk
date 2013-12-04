@@ -18,6 +18,7 @@ package wattsup.jsdk.core.data.storage.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -63,16 +64,11 @@ public class RamMemory<T> implements Memory<T>
     }
 
     @Override
-    public <V> void dump(OutputStream out, Serializer<T, V> serializer) throws IOException
+    public void dump(OutputStream out, Serializer serializer) throws IOException
     {
         for (T value : this.entriesMap_.values())
         {
-            Object serialized = serializer.serialize(value);
-
-            if (serialized instanceof byte[])
-            {
-                out.write((byte[]) serialized);
-            }
+            serializer.serialize(out, (Serializable) value);
         }
     }
 

@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.server;
+package wattsup.jsdk.remote.data;
 
 import java.io.Serializable;
 
@@ -25,7 +25,7 @@ public class Response implements Serializable
     /**
      * Serial code version <code>serialVersionUID</code> for serialization.
      */
-    private static final long serialVersionUID = -6325563256519604244L;
+    private static final long serialVersionUID = -3731516867482319587L;
 
     /**
      * Response's id.
@@ -38,6 +38,11 @@ public class Response implements Serializable
     private Serializable data_;
 
     /**
+     * Response's time.
+     */
+    private long time_;
+
+    /**
      * Creates a new {@link Response} instance with a given ID.
      * 
      * @param id
@@ -45,6 +50,7 @@ public class Response implements Serializable
      */
     public Response(ID id)
     {
+        this();
         this.id_ = id;
     }
 
@@ -54,6 +60,7 @@ public class Response implements Serializable
     public Response()
     {
         super();
+        this.time_ = System.currentTimeMillis();
     }
 
     /**
@@ -93,6 +100,18 @@ public class Response implements Serializable
     }
 
     /**
+     * 
+     * @param time
+     *            Response's time value.
+     * @return This instance with the new time.
+     */
+    public Response withTime(long time)
+    {
+        this.time_ = time;
+        return this;
+    }
+
+    /**
      * @return the id
      */
     public ID getId()
@@ -109,6 +128,14 @@ public class Response implements Serializable
     public <T extends Serializable> T getData()
     {
         return (T) data_;
+    }
+
+    /**
+     * @return the response's time.
+     */
+    public long getTime()
+    {
+        return time_;
     }
 
     @Override

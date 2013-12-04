@@ -14,36 +14,18 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.core.data;
+package wattsup.jsdk.client.jcommander.converter;
 
-import java.util.concurrent.atomic.AtomicLong;
+import wattsup.jsdk.core.data.ID;
 
-/**
- * 
- */
-public final class Sequence
+import com.beust.jcommander.IStringConverter;
+
+public class IDConverter implements IStringConverter<ID>
 {
-    /**
-     */
-    private AtomicLong source_ = new AtomicLong(0);
 
-    /**
-     * Returns the current value incremented by one.
-     * 
-     * @return The next sequence value.
-     */
-    public Long nextValue()
+    @Override
+    public ID convert(String value)
     {
-        return this.source_.incrementAndGet();
-    }
-
-    /**
-     * Returns the current value.
-     * 
-     * @return The current value.
-     */
-    public Long currentValue()
-    {
-        return this.source_.get();
+       return ID.fromString(value);
     }
 }

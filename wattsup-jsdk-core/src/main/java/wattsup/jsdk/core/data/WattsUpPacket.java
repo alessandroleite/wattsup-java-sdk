@@ -22,7 +22,7 @@ import java.util.List;
 
 import wattsup.jsdk.core.data.WattsUpConfig.Delimiter;
 
-public final class WattsUpPacket implements Serializable
+public final class WattsUpPacket implements Serializable, Comparable<WattsUpPacket>
 {
     /**
      * Serial code version <code>serialVersionUID</code> for serialization.
@@ -43,8 +43,7 @@ public final class WattsUpPacket implements Serializable
      * The labels defined by the power meter.
      */
     private static final String[] LABELS = new String[NUM_FIELDS];
-    
-    
+
     /**
      * This packet id.
      */
@@ -102,8 +101,11 @@ public final class WattsUpPacket implements Serializable
 
     /**
      * Private constructor to avoid instance of this class outside of the method {@link #parser(String, Delimiter, long)}.
-     * @param record The data as returned by the meter.
-     * @param time The time that the data were read.
+     * 
+     * @param record
+     *            The data as returned by the meter.
+     * @param time
+     *            The time that the data were read.
      */
     private WattsUpPacket(String record, long time)
     {
@@ -134,7 +136,8 @@ public final class WattsUpPacket implements Serializable
             // {
             // String [] records = new String[lines.length - 3];
             // System.arraycopy(lines, 1, records, 0, records.length);
-            // packets = new WattsUpPacket[Integer.valueOf(lines[0].split(delimiter.getSymbol())[5])];
+            // packets = new
+            // WattsUpPacket[Integer.valueOf(lines[0].split(delimiter.getSymbol())[5])];
             //
             // }
             packets = parser(lines, delimiter, packetTime);
@@ -193,8 +196,6 @@ public final class WattsUpPacket implements Serializable
 
         return packets.toArray(new WattsUpPacket[packets.size()]);
     }
-    
-    
 
     /**
      * @return the id
@@ -235,7 +236,7 @@ public final class WattsUpPacket implements Serializable
     {
         return fields_.clone();
     }
-    
+
     /**
      * @return the time
      */
@@ -254,5 +255,11 @@ public final class WattsUpPacket implements Serializable
             sb.append(" ").append(f.getValue());
         }
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(WattsUpPacket other)
+    {
+        return Long.valueOf(this.getTime()).compareTo(other.getTime());
     }
 }

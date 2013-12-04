@@ -38,12 +38,10 @@ public interface Memory<T>
      *            An {@link OutputStream} instance to write the data. Might not be <code>null</code>.
      * @param serializer
      *            A {@link Serializer} instance to convert from the stored type (T) to a serializable format. Might not be <code>null</code>.
-     * @param <V>
-     *            The type returned by the serializer.
      * @throws IOException
      *             If an I/O error occurs.
      */
-    <V> void dump(OutputStream out, Serializer<T, V> serializer) throws IOException;
+    void dump(OutputStream out, Serializer serializer) throws IOException;
 
     /**
      * Store the data into memory.

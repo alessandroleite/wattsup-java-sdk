@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.server;
+package wattsup.jsdk.remote.data;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -57,6 +57,7 @@ public class Request implements Serializable
     public Request(ID id)
     {
         this.id_ = Objects.requireNonNull(id);
+        this.time_ = System.currentTimeMillis();
     }
 
     /**

@@ -64,17 +64,20 @@
 		<module>wattsup-jsdk-client</module>
 		<module>wattsup-jsdk-console</module>
 		<module>wattsup-jsdk-core</module>
+		<module>wattsup-jsdk-remote</module>
 		<module>wattsup-jsdk-server</module>
 		<module>wattsup-jsdk-ui</module>
 	</modules>
 
 	<build>
+		<defaultGoal>package</defaultGoal>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>2.10</version>
+					<inherited>true</inherited>
 					<configuration>
 						<configLocation>${checkstyle.file}</configLocation>
 						<headerLocation>${license-header-file}</headerLocation>
@@ -85,6 +88,7 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.1</version>
+					<inherited>true</inherited>
 					<configuration>
 						<encoding>${project.build.sourceEncoding}</encoding>
 						<source>${java.source.version}</source>
@@ -115,6 +119,7 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>2.9</version>
+					<inherited>true</inherited>
 					<executions>
 						<execution>
 							<id>attach-sources</id>
@@ -130,6 +135,7 @@
 					<groupId>com.mycila.maven-license-plugin</groupId>
 					<artifactId>maven-license-plugin</artifactId>
 					<version>1.9.0</version>
+					<inherited>true</inherited>
 					<configuration>
 						<header>${license-header-file}</header>
 						<excludes>
@@ -156,6 +162,7 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
 					<version>2.9</version>
+					<inherited>true</inherited>
 					<configuration>
 						<additionalProjectnatures>
 							<projectnature>org.maven.ide.eclipse.maven2Nature</projectnature>

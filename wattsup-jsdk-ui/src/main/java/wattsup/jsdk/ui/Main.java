@@ -35,7 +35,6 @@ import wattsup.jsdk.core.event.WattsUpDataAvailableEvent;
 import wattsup.jsdk.core.event.WattsUpDisconnectEvent;
 import wattsup.jsdk.core.listener.WattsUpDataAvailableListener;
 import wattsup.jsdk.core.listener.WattsUpDisconnectListener;
-import wattsup.jsdk.core.listener.impl.ExportCsvListener;
 import wattsup.jsdk.core.meter.WattsUp;
 import wattsup.jsdk.ui.chart.line.WattsLineChart;
 
@@ -102,7 +101,7 @@ public class Main extends JFrame
         if (path != null && !path.isEmpty())
         {
             final FileOutputStream fos = new FileOutputStream(new File(path));
-            meter_.registerListener(new ExportCsvListener(fos));
+//            meter_.registerListener(new ExportCsvListener(fos));
             
             Runtime.getRuntime().addShutdownHook(new Thread()
             {

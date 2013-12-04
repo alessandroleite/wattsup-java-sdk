@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.server;
+package wattsup.jsdk.server.app;
 
 import java.io.IOException;
 
@@ -22,6 +22,7 @@ import wattsup.jsdk.core.data.WattsUpConfig;
 import wattsup.jsdk.core.event.WattsUpDisconnectEvent;
 import wattsup.jsdk.core.listener.WattsUpDisconnectListener;
 import wattsup.jsdk.core.meter.WattsUp;
+import wattsup.jsdk.server.WattsUpServer;
 
 public final class Main
 {

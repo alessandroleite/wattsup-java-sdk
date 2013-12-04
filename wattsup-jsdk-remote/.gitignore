@@ -1,0 +1,13 @@
+*~
+#eclipse
+.settings
+.classpath
+.project
+.checkstyle
+
+#binary
+bin/
+target/
+lib/
+
+.DS_Store

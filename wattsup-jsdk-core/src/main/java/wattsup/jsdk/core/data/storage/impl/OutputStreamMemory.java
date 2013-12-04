@@ -1,7 +1,24 @@
+/**
+ *     Copyright (C) 2013 Contributors
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
 package wattsup.jsdk.core.data.storage.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -26,7 +43,7 @@ public class OutputStreamMemory<T> implements Memory<T>
     /**
      * 
      */
-    private final Serializer<T, byte[]> serializer_;
+    private final Serializer serializer_;
 
     /**
      * The number of bytes write in the {@link OutputStream}.
@@ -40,7 +57,7 @@ public class OutputStreamMemory<T> implements Memory<T>
      * @param out
      *            {@link OutputStream} to write the data.
      */
-    public OutputStreamMemory(Serializer<T, byte[]> serializer, OutputStream out)
+    public OutputStreamMemory(Serializer serializer, OutputStream out)
     {
         this.out_ = out;
         this.serializer_ = serializer;
@@ -52,7 +69,7 @@ public class OutputStreamMemory<T> implements Memory<T>
     }
 
     @Override
-    public <V> void dump(OutputStream out, Serializer<T, V> serializer) throws IOException
+    public void dump(OutputStream out, Serializer serializer) throws IOException
     {
         //see https://code.google.com/p/io-tools/
     }
@@ -62,9 +79,7 @@ public class OutputStreamMemory<T> implements Memory<T>
     {
         try
         {
-            byte[] b = this.serializer_.serialize(data);
-            size_ += b.length;
-            this.out_.write(b);
+            size_ += this.serializer_.serialize(out_, (Serializable) data);
         }
         catch (IOException exception)
         {

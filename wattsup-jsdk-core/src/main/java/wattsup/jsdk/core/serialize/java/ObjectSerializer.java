@@ -14,30 +14,35 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.core.serialize;
+package wattsup.jsdk.core.serialize.java;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
-public interface Serializer
+import wattsup.jsdk.core.serialize.Serializer;
+
+public class ObjectSerializer implements Serializer
 {
-    /**
-     * Serializes an object to a specified format.
-     * 
-     * @param out
-     *            to write the data.
-     * @param value
-     *            Object to serialize.
-     * @return The amount of data wrote into the output.
-     * @throws IOException
-     *             if an I/O error occurs.
-     */
-    int serialize(OutputStream out, Serializable value) throws IOException;
+
+    @Override
+    public int serialize(OutputStream out, Serializable value) throws IOException
+    {
+        try(ByteArrayOutputStream baos = new ByteArrayOutputStream(); ObjectOutputStream out2 = new ObjectOutputStream(baos))
+        {
+            out2.writeObject(value);
+            byte[] b = baos.toByteArray();
+            
+            out.write(b);
+            return b.length;
+        }
+    }
 
     /**
-     * Reads an object from an {@link InputStream}.
      * 
      * @param in
      *            to read serialized data from.
@@ -49,5 +54,17 @@ public interface Serializer
      * @throws IOException
      *             if an I/O error occurs.
      */
-    <A extends Serializable> A deserialize(InputStream in, int available) throws IOException;
+    @SuppressWarnings("unchecked")
+    @Override
+    public <A extends Serializable> A deserialize(InputStream in, int available) throws IOException
+    {
+        try
+        {
+            return (A) new ObjectInputStream(in).readObject();
+        }
+        catch (ClassNotFoundException cnfe)
+        {
+            throw new IOException(cnfe);
+        }
+    }
 }

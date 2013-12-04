@@ -14,36 +14,21 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.core.data;
+package wattsup.jsdk.client.jcommander.validator;
 
-import java.util.concurrent.atomic.AtomicLong;
+import wattsup.jsdk.remote.data.CommandType;
 
-/**
- * 
- */
-public final class Sequence
+import com.beust.jcommander.IValueValidator;
+import com.beust.jcommander.ParameterException;
+
+public class RemoteCommandNameValidator implements IValueValidator<CommandType>
 {
-    /**
-     */
-    private AtomicLong source_ = new AtomicLong(0);
-
-    /**
-     * Returns the current value incremented by one.
-     * 
-     * @return The next sequence value.
-     */
-    public Long nextValue()
+    @Override
+    public void validate(String name, CommandType value) throws ParameterException
     {
-        return this.source_.incrementAndGet();
-    }
-
-    /**
-     * Returns the current value.
-     * 
-     * @return The current value.
-     */
-    public Long currentValue()
-    {
-        return this.source_.get();
+        if (value == null)
+        {
+            throw new ParameterException("Invalid command value!");
+        }
     }
 }

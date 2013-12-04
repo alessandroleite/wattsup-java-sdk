@@ -14,17 +14,37 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.server;
+package wattsup.jsdk.client;
 
-public enum CommandType
+import wattsup.jsdk.core.serialize.Serializer;
+import wattsup.jsdk.core.serialize.csv.CsvWattsUpPacketSerializer;
+import wattsup.jsdk.data.serialize.json.JsonSerializer;
+import wattsup.jsdk.remote.data.Response;
+
+public enum OutputFormat
 {
     /**
      * 
      */
-    START, 
-    
+    CSV(new CsvWattsUpPacketSerializer().includeHeader().includeRownum()),
+
     /**
      * 
      */
-    END;
+    JSON(new JsonSerializer<Response>(Response.class));
+
+    private final Serializer serialize_;
+
+    private OutputFormat(Serializer serializer)
+    {
+        this.serialize_ = serializer;
+    }
+
+    /**
+     * @return the serialize
+     */
+    public Serializer getSerialize()
+    {
+        return serialize_;
+    }
 }

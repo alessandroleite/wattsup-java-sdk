@@ -22,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -30,8 +31,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import wattsup.jsdk.core.data.ID;
+import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.meter.WattsUp;
+import wattsup.jsdk.remote.data.Request;
+import wattsup.jsdk.remote.data.Response;
 import wattsup.jsdk.server.memory.OffHeapMemory;
 
 public class RequestHandler
@@ -59,13 +63,11 @@ public class RequestHandler
      * The reference to the {@link WattsUp} to read the data.
      */
     private final WattsUp wattsUp_;
-    
+
     /**
      * 
      */
-    private final OffHeapMemory memory_ = new OffHeapMemory();
-
-   
+    private final OffHeapMemory<WattsUpPacket> memory_ = new OffHeapMemory<WattsUpPacket>();
 
     /**
      * 
@@ -101,23 +103,54 @@ public class RequestHandler
             schedule(worker);
             reply(client, request.getId(), Boolean.TRUE);
             break;
-        case END:
+            
+        case END: 
             worker = workers_.remove(request.getId());
 
+            final Serializable data;
             if (worker != null)
             {
                 worker.finish();
-                this.executor_.execute(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        reply(client, worker.getId(), (Serializable) worker.getData());
-                    }
-                });
-                memory_.freeRegion(request.getName());
+                data = (Serializable) worker.getData();
             }
+            else
+            {
+                data = new HashMap<>();
+            }
+            
+            this.executor_.execute(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    reply(client, request.getId(), data);
+                    memory_.freeRegion(request.getName());
+                }
+            });
+
             break;
+        case DUMP:
+
+            worker = workers_.get(request.getId());
+
+            if (worker != null)
+            {
+                data = (Serializable) worker.getData();
+            }
+            else
+            {
+                data = (Serializable) this.memory_.values();
+            }
+            this.executor_.execute(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    reply(client, request.getId(), data);
+                }
+            });
+            break;
+
         default:
             worker = new SyncWorker(request.getId(), this.wattsUp_, client.getOutputStream());
             schedule(worker);

@@ -106,7 +106,7 @@ public abstract class AbstractWorker implements Worker
     @Override
     public synchronized void start()
     {
-        if (!this.isFinished() && !WorkerState.RUNNING.equals(state_))
+        if (!isRunning() && !this.isFinished())
         {
             state_ = WorkerState.RUNNING;
 
@@ -139,7 +139,7 @@ public abstract class AbstractWorker implements Worker
             this.stop();
             state_ = WorkerState.FINISHED;
             this.wattsUp_.unregisterListener(listeners_[listeners_.length - 1]);
-            
+
             synchronized (mutex_)
             {
                 mutex_.notifyAll();
@@ -151,6 +151,17 @@ public abstract class AbstractWorker implements Worker
     public ID getId()
     {
         return id_;
+    }
+
+    /**
+     * Returns <code>true</code> if the worker's state is running.
+     * 
+     * @return <code>true</code> if the worker's state is running.
+     */
+    public boolean isRunning()
+    {
+        return WorkerState.RUNNING.equals(state_);
+
     }
 
     /**

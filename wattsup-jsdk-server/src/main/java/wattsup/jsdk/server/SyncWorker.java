@@ -39,7 +39,7 @@ public final class SyncWorker extends AbstractWorker
      */
     public SyncWorker(ID id, WattsUp wattsUp, OutputStream out)
     {
-        super(id, wattsUp, new DefaultWattsUpDataAvailableListener(new OutputStreamMemory(new CsvWattsUpPacketSerializer(), out)));
+        super(id, wattsUp, new DefaultWattsUpDataAvailableListener(new OutputStreamMemory<WattsUpPacket>(new CsvWattsUpPacketSerializer(), out)));
     }
 
     @Override

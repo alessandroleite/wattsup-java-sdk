@@ -14,36 +14,25 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package wattsup.jsdk.core.data;
+package wattsup.jsdk.client.jcommander.converter;
 
-import java.util.concurrent.atomic.AtomicLong;
+import wattsup.jsdk.remote.data.CommandType;
 
-/**
- * 
- */
-public final class Sequence
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
+
+public class CommandTypeConverter implements IStringConverter<CommandType>
 {
-    /**
-     */
-    private AtomicLong source_ = new AtomicLong(0);
-
-    /**
-     * Returns the current value incremented by one.
-     * 
-     * @return The next sequence value.
-     */
-    public Long nextValue()
+    @Override
+    public CommandType convert(String value)
     {
-        return this.source_.incrementAndGet();
-    }
+        CommandType command = CommandType.valueOf(value.trim().toUpperCase());
 
-    /**
-     * Returns the current value.
-     * 
-     * @return The current value.
-     */
-    public Long currentValue()
-    {
-        return this.source_.get();
+        if (command == null)
+        {
+            throw new ParameterException("Invalid command value!" + value);
+        }
+
+        return command;
     }
 }

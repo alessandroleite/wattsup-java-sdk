@@ -16,6 +16,10 @@
  */
 package wattsup.jsdk.core.serialize.csv;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -23,9 +27,9 @@ import wattsup.jsdk.core.data.Field;
 import wattsup.jsdk.core.data.Sequence;
 import wattsup.jsdk.core.data.WattsUpConfig.Delimiter;
 import wattsup.jsdk.core.data.WattsUpPacket;
-import wattsup.jsdk.core.serialize.WattsUpPacketSerializer;
+import wattsup.jsdk.core.serialize.Serializer;
 
-public class CsvWattsUpPacketSerializer implements WattsUpPacketSerializer
+public class CsvWattsUpPacketSerializer implements Serializer
 {
     /**
      * A flag to indicate if a header number must be included in output. The header is the name of the fields/columns.
@@ -126,10 +130,12 @@ public class CsvWattsUpPacketSerializer implements WattsUpPacketSerializer
     }
 
     @Override
-    public byte[] serialize(WattsUpPacket packet)
+    public int serialize(final OutputStream out, final Serializable value) throws IOException
     {
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat dateFormat = new SimpleDateFormat(this.dateFormatPattern_);
+        
+        final WattsUpPacket packet = (WattsUpPacket) value;
 
         if (includeHeader_ && !headerIncluded_)
         {
@@ -158,7 +164,16 @@ public class CsvWattsUpPacketSerializer implements WattsUpPacketSerializer
         }
 
         sb.append("\n");
+        
+        byte[] b = sb.toString().getBytes();
+        out.write(b);
+        
+        return b.length;
+    }
 
-        return sb.toString().getBytes();
+    @Override
+    public <A extends Serializable> A deserialize(InputStream in, int available) throws IOException
+    {
+        return null;
     }
 }
