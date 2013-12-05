@@ -19,20 +19,21 @@ package wattsup.jsdk.client.jcommander.converter;
 import wattsup.jsdk.remote.data.CommandType;
 
 import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.ParameterException;
 
 public class CommandTypeConverter implements IStringConverter<CommandType>
 {
     @Override
     public CommandType convert(String value)
     {
-        CommandType command = CommandType.valueOf(value.trim().toUpperCase());
-
-        if (command == null)
+        CommandType command;
+        try
         {
-            throw new ParameterException("Invalid command value!" + value);
+            command = CommandType.valueOf(value.trim().toUpperCase());
         }
-
+        catch (java.lang.IllegalArgumentException exception)
+        {
+            command = null;
+        }
         return command;
     }
 }

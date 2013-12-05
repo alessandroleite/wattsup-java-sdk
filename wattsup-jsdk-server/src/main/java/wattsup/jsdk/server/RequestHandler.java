@@ -16,6 +16,7 @@
  */
 package wattsup.jsdk.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -34,6 +35,7 @@ import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.meter.WattsUp;
+import wattsup.jsdk.core.util.IOUtils;
 import wattsup.jsdk.remote.data.Request;
 import wattsup.jsdk.remote.data.Response;
 import wattsup.jsdk.server.memory.OffHeapMemory;
@@ -103,8 +105,8 @@ public class RequestHandler
             schedule(worker);
             reply(client, request.getId(), Boolean.TRUE);
             break;
-            
-        case END: 
+
+        case END:
             worker = workers_.remove(request.getId());
 
             final Serializable data;
@@ -117,7 +119,7 @@ public class RequestHandler
             {
                 data = new HashMap<>();
             }
-            
+
             this.executor_.execute(new Runnable()
             {
                 @Override
@@ -130,6 +132,7 @@ public class RequestHandler
 
             break;
         case DUMP:
+        case GET:
 
             worker = workers_.get(request.getId());
 
@@ -179,6 +182,7 @@ public class RequestHandler
      *            Request id that the response belongs to.
      * @param value
      *            Response's value.
+     * @param compress A flag to indicate if the data must be compressed before the transmission.
      */
     private void reply(Socket client, ID id, Serializable value)
     {
@@ -186,10 +190,12 @@ public class RequestHandler
         {
             Response response = Response.newResponse(id).withData(value);
 
-            try (ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream()))
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ObjectOutputStream oos = new ObjectOutputStream(out))
             {
                 oos.writeObject(response);
-                oos.flush();
+                client.getOutputStream().write(IOUtils.compress(out.toByteArray()));
+                client.getOutputStream().flush();
             }
             catch (IOException exception)
             {

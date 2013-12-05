@@ -23,12 +23,17 @@ import com.beust.jcommander.ParameterException;
 
 public class RemoteCommandNameValidator implements IValueValidator<CommandType>
 {
+    /**
+     * The valid commands.
+     */
+    public static final String AVAILABLE_COMMANDS = CommandType.asString().toLowerCase();
+
     @Override
     public void validate(String name, CommandType value) throws ParameterException
     {
         if (value == null)
         {
-            throw new ParameterException("Invalid command value!");
+            throw new ParameterException(String.format("Invalid command! The available commands are: %s", AVAILABLE_COMMANDS));
         }
     }
 }

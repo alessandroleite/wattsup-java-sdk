@@ -32,11 +32,11 @@ public class ObjectSerializer implements Serializer
     @Override
     public int serialize(OutputStream out, Serializable value) throws IOException
     {
-        try(ByteArrayOutputStream baos = new ByteArrayOutputStream(); ObjectOutputStream out2 = new ObjectOutputStream(baos))
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ObjectOutputStream out2 = new ObjectOutputStream(baos))
         {
             out2.writeObject(value);
             byte[] b = baos.toByteArray();
-            
+
             out.write(b);
             return b.length;
         }

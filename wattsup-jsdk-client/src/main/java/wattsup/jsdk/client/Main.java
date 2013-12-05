@@ -16,7 +16,9 @@
  */
 package wattsup.jsdk.client;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +34,6 @@ import com.beust.jcommander.ParameterException;
 
 public final class Main
 {
-
     /**
      * Constructor.
      */
@@ -54,10 +55,20 @@ public final class Main
         ClientCommand client = new ClientCommand();
         JCommander commander = new JCommander(client);
 
+        OutputStream out = System.out;
+
         try
         {
             commander.parse(args);
             Response response = client.execute();
+            
+            if (client.getOutputFile() != null)
+            {
+                client.getOutputFile().createNewFile();
+                out = new FileOutputStream(client.getOutputFile());
+                
+            }
+            
             if (CommandType.START.equals(client.getCommand()))
             {
                 System.out.println(response.getId());
@@ -72,13 +83,18 @@ public final class Main
 
                 for (WattsUpPacket packet : data)
                 {
-                    client.getOutputFormat().getSerialize().serialize(System.out, packet);
+                    client.getOutputFormat().getSerialize().serialize(out, packet);
                 }
             }
         }
         catch (ParameterException exception)
         {
+            System.err.println(exception.getMessage());
             commander.usage();
+        }
+        finally
+        {
+            out.close();
         }
     }
 }

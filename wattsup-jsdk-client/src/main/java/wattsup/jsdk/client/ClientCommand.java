@@ -16,6 +16,7 @@
  */
 package wattsup.jsdk.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -25,11 +26,13 @@ import wattsup.jsdk.client.jcommander.converter.IDConverter;
 import wattsup.jsdk.client.jcommander.validator.RemoteCommandNameValidator;
 import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.serialize.java.ObjectSerializer;
+import wattsup.jsdk.core.util.IOUtils;
 import wattsup.jsdk.remote.data.CommandType;
 import wattsup.jsdk.remote.data.Request;
 import wattsup.jsdk.remote.data.Response;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.converters.FileConverter;
 
 public class ClientCommand
 {
@@ -57,7 +60,7 @@ public class ClientCommand
     /**
      * 
      */
-    @Parameter(names = { "-c", "-cmd", "-command" }, required = true, converter = CommandTypeConverter.class, validateValueWith = RemoteCommandNameValidator.class, description = "The command to execute. The valid values are:[start, dump, end].")
+    @Parameter(names = { "-c", "-cmd", "-command" }, required = true, converter = CommandTypeConverter.class, validateValueWith = RemoteCommandNameValidator.class)
     private CommandType command_;
 
     /**
@@ -65,6 +68,12 @@ public class ClientCommand
      */
     @Parameter(names = { "-of", "-output-format" }, description = "The output format. The valid values are:[CSV, JSON, PLAIN].")
     private OutputFormat outputFormat_ = OutputFormat.CSV;
+
+    /**
+     * 
+     */
+    @Parameter(names = { "-file", "-output-file", "-out" }, converter = FileConverter.class)
+    private File output_;
 
     /**
      * 
@@ -85,7 +94,7 @@ public class ClientCommand
             Request request = Request.newRequest().withName(name_).withId(id_ == null ? ID.randomID() : id_).withCommand(command_);
             serializer.serialize(socket.getOutputStream(), request);
 
-            return serializer.deserialize(socket.getInputStream(), socket.getInputStream().available());
+            return serializer.deserialize(IOUtils.createInputStream(IOUtils.readfully(socket.getInputStream())), socket.getInputStream().available());
         }
         finally
         {
@@ -114,5 +123,15 @@ public class ClientCommand
     public CommandType getCommand()
     {
         return command_;
+    }
+
+    /**
+     * Returns the {@link File} to write the data.
+     * 
+     * @return The {@link File} to write the data.
+     */
+    public File getOutputFile()
+    {
+        return output_;
     }
 }

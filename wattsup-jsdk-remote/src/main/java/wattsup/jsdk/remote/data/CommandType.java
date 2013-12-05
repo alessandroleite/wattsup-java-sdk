@@ -26,10 +26,52 @@ public enum CommandType
     /**
      * Get the data available.
      */
+    GET,
+
+    /**
+     * Writes the data into the response output.
+     */
     DUMP,
 
     /**
-     * Finalizes a measurement block.
+     * Writes the data into an output.
      */
-    END;
+    DUMP_TO,
+
+    /**
+     * Finalizes a block's measurement.
+     */
+    END,
+
+    /**
+     * Clear the memory.
+     */
+    CLEAR,
+
+    /**
+     * Writes the data into the output and clear the memory.
+     */
+    DUMP_TO_AND_CLEAR;
+
+    /**
+     * Returns as {@link String} the values separated by comma.
+     * 
+     * @return The values separated by comma.
+     */
+    public static String asString()
+    {
+        StringBuilder availableCommands = new StringBuilder("[");
+
+        for (int i = 0; i < CommandType.values().length; i++)
+        {
+            if (i > 0)
+            {
+                availableCommands.append(",");
+            }
+            availableCommands.append(CommandType.values()[i].name());
+        }
+        availableCommands.append("]");
+
+        return availableCommands.toString();
+    }
 }

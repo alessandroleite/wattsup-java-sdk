@@ -42,7 +42,7 @@ public class OffHeapMemory<T> implements Memory<T>
     /**
      * 
      */
-    private final DB storage_;
+    private final DB db_;
 
     /**
      * 
@@ -54,7 +54,7 @@ public class OffHeapMemory<T> implements Memory<T>
      */
     public OffHeapMemory()
     {
-        storage_ = DBMaker.newDirectMemoryDB().compressionEnable().make();
+        db_ = DBMaker.newDirectMemoryDB().transactionDisable().asyncFlushDelay(100).compressionEnable().make();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class OffHeapMemory<T> implements Memory<T>
         for (String region : this.regions_.keySet())
         {
             this.regions_.get(region).clear();
-            this.storage_.delete(region);
+            this.db_.delete(region);
         }
 
         regions_.clear();
@@ -130,7 +130,7 @@ public class OffHeapMemory<T> implements Memory<T>
 
         if (memory == null)
         {
-            memory = new RamMemory<T>(this.storage_.<ID, T> getTreeMap(name));
+            memory = new RamMemory<T>(this.db_.<ID, T> getTreeMap(name));
             this.regions_.put(name, memory);
         }
 
@@ -140,7 +140,7 @@ public class OffHeapMemory<T> implements Memory<T>
     public synchronized void freeRegion(String name)
     {
         this.regions_.remove(name);
-        this.storage_.delete(name);
+        this.db_.delete(name);
     }
 
 }
