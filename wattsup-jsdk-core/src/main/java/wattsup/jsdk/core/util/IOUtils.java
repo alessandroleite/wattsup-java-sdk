@@ -51,11 +51,10 @@ public final class IOUtils
         {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
             {
-                byte[] buffer = new byte[256];
                 int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1)
+                while ((bytesRead = in.read()) > 0)
                 {
-                    baos.write(buffer, 0, bytesRead);
+                    baos.write(bytesRead);
                 }
                 result = baos.toByteArray();
             }
@@ -89,12 +88,15 @@ public final class IOUtils
                 byte[] buffer = new byte[1024];
                 while (!compressor.finished())
                 {
-                    int nBytes = compressor.deflate(buffer);
-                    out.write(buffer, 0, nBytes);
+                    int bytesCompressed = compressor.deflate(buffer);
+                    out.write(buffer, 0, bytesCompressed);
                 }
                 result = out.toByteArray();
             }
+
+            compressor.end();
         }
+
         return result;
     }
 
@@ -118,15 +120,18 @@ public final class IOUtils
             Inflater decompressor = new Inflater();
             decompressor.setInput(data);
 
-            try (ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length))
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream())
             {
                 byte[] buffer = new byte[1024];
+
                 while (!decompressor.finished())
                 {
-                    bos.write(buffer, 0, decompressor.inflate(buffer));
+                    int count = decompressor.inflate(buffer);
+                    bos.write(buffer, 0, count);
                 }
                 uncompresses = bos.toByteArray();
             }
+            decompressor.end();
         }
         return uncompresses;
     }

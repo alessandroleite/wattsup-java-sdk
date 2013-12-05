@@ -20,13 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
 
 import wattsup.jsdk.client.jcommander.converter.CommandTypeConverter;
 import wattsup.jsdk.client.jcommander.converter.IDConverter;
 import wattsup.jsdk.client.jcommander.validator.RemoteCommandNameValidator;
 import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.serialize.java.ObjectSerializer;
-import wattsup.jsdk.core.util.IOUtils;
 import wattsup.jsdk.remote.data.CommandType;
 import wattsup.jsdk.remote.data.Request;
 import wattsup.jsdk.remote.data.Response;
@@ -81,7 +82,7 @@ public class ClientCommand
     @Parameter(names = { "-timeout" }, description = "Timeout in milliseconds to wait for a response. Default is one minute.")
     private int timeout_ = 1 * 60 * 1000; // one minute
 
-    public Response execute() throws UnknownHostException, IOException
+    public Response execute() throws UnknownHostException, IOException, DataFormatException
     {
         ObjectSerializer serializer = new ObjectSerializer();
 
@@ -94,7 +95,7 @@ public class ClientCommand
             Request request = Request.newRequest().withName(name_).withId(id_ == null ? ID.randomID() : id_).withCommand(command_);
             serializer.serialize(socket.getOutputStream(), request);
 
-            return serializer.deserialize(IOUtils.createInputStream(IOUtils.readfully(socket.getInputStream())), socket.getInputStream().available());
+            return serializer.deserialize(new GZIPInputStream(socket.getInputStream()), socket.getInputStream().available());
         }
         finally
         {

@@ -16,7 +16,6 @@
  */
 package wattsup.jsdk.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -30,12 +29,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
 
 import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.meter.WattsUp;
-import wattsup.jsdk.core.util.IOUtils;
 import wattsup.jsdk.remote.data.Request;
 import wattsup.jsdk.remote.data.Response;
 import wattsup.jsdk.server.memory.OffHeapMemory;
@@ -190,12 +189,11 @@ public class RequestHandler
         {
             Response response = Response.newResponse(id).withData(value);
 
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(out))
+            
+            try (GZIPOutputStream gout = new GZIPOutputStream(client.getOutputStream());
+                    ObjectOutputStream oos = new ObjectOutputStream(gout))
             {
                 oos.writeObject(response);
-                client.getOutputStream().write(IOUtils.compress(out.toByteArray()));
-                client.getOutputStream().flush();
             }
             catch (IOException exception)
             {

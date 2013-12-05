@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.remote.data.CommandType;
@@ -48,9 +49,10 @@ public final class Main
      *            The console arguments.
      * @throws IOException
      *             If an I/O error occurs.
+     * @throws DataFormatException 
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args) throws IOException, DataFormatException
     {
         ClientCommand client = new ClientCommand();
         JCommander commander = new JCommander(client);
