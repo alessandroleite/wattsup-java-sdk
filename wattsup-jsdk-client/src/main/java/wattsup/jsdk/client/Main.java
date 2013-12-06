@@ -19,15 +19,21 @@ package wattsup.jsdk.client;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
 
+import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.WattsUpPacket;
+import wattsup.jsdk.core.serialize.java.ObjectSerializer;
 import wattsup.jsdk.remote.data.CommandType;
+import wattsup.jsdk.remote.data.Request;
 import wattsup.jsdk.remote.data.Response;
 
 import com.beust.jcommander.JCommander;
@@ -42,6 +48,30 @@ public final class Main
     {
         throw new UnsupportedOperationException();
     }
+    
+    protected static Response execute(Args args) throws UnknownHostException, IOException, DataFormatException
+    {
+        ObjectSerializer serializer = new ObjectSerializer();
+
+        Socket socket = null;
+        try
+        {
+            socket = new Socket(args.getHost(), args.getPort());
+            socket.setSoTimeout(args.getTimeout());
+
+            Request request = Request.newRequest().withName(args.getName()).withId(args.getId() == null ? ID.randomID() : args.getId()).withCommand(args.getCommand());
+            serializer.serialize(socket.getOutputStream(), request);
+
+            return serializer.deserialize(new GZIPInputStream(socket.getInputStream()), socket.getInputStream().available());
+        }
+        finally
+        {
+            if (socket != null)
+            {
+                socket.close();
+            }
+        }
+    }
 
     /**
      * 
@@ -54,7 +84,7 @@ public final class Main
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void main(String[] args) throws IOException, DataFormatException
     {
-        ClientCommand client = new ClientCommand();
+        Args client = new Args();
         JCommander commander = new JCommander(client);
 
         OutputStream out = System.out;
@@ -62,7 +92,7 @@ public final class Main
         try
         {
             commander.parse(args);
-            Response response = client.execute();
+            Response response = execute(client);
             
             if (client.getOutputFile() != null)
             {

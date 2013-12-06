@@ -17,25 +17,17 @@
 package wattsup.jsdk.client;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.zip.DataFormatException;
-import java.util.zip.GZIPInputStream;
 
 import wattsup.jsdk.client.jcommander.converter.CommandTypeConverter;
 import wattsup.jsdk.client.jcommander.converter.IDConverter;
 import wattsup.jsdk.client.jcommander.validator.RemoteCommandNameValidator;
 import wattsup.jsdk.core.data.ID;
-import wattsup.jsdk.core.serialize.java.ObjectSerializer;
 import wattsup.jsdk.remote.data.CommandType;
-import wattsup.jsdk.remote.data.Request;
-import wattsup.jsdk.remote.data.Response;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
 
-public class ClientCommand
+public final class Args
 {
     /**
      * 
@@ -55,7 +47,7 @@ public class ClientCommand
     /**
      * 
      */
-    @Parameter(names = { "-method", "-name", "-region" }, required = true)
+    @Parameter(names = { "-method", "-name", "-region" })
     private String name_;
 
     /**
@@ -82,29 +74,7 @@ public class ClientCommand
     @Parameter(names = { "-timeout" }, description = "Timeout in milliseconds to wait for a response. Default is one minute.")
     private int timeout_ = 1 * 60 * 1000; // one minute
 
-    public Response execute() throws UnknownHostException, IOException, DataFormatException
-    {
-        ObjectSerializer serializer = new ObjectSerializer();
-
-        Socket socket = null;
-        try
-        {
-            socket = new Socket(host_, port_);
-            socket.setSoTimeout(timeout_);
-
-            Request request = Request.newRequest().withName(name_).withId(id_ == null ? ID.randomID() : id_).withCommand(command_);
-            serializer.serialize(socket.getOutputStream(), request);
-
-            return serializer.deserialize(new GZIPInputStream(socket.getInputStream()), socket.getInputStream().available());
-        }
-        finally
-        {
-            if (socket != null)
-            {
-                socket.close();
-            }
-        }
-    }
+    
 
     /**
      * Returns the {@link OutputFormat}.
@@ -134,5 +104,45 @@ public class ClientCommand
     public File getOutputFile()
     {
         return output_;
+    }
+
+    /**
+     * @return the host_
+     */
+    public String getHost()
+    {
+        return host_;
+    }
+
+    /**
+     * @return the port_
+     */
+    public int getPort()
+    {
+        return port_;
+    }
+
+    /**
+     * @return the id_
+     */
+    public ID getId()
+    {
+        return id_;
+    }
+
+    /**
+     * @return the name_
+     */
+    public String getName()
+    {
+        return name_;
+    }
+
+    /**
+     * @return the timeout_
+     */
+    public int getTimeout()
+    {
+        return timeout_;
     }
 }
