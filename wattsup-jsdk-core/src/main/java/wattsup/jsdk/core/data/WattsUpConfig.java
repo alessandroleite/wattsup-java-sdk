@@ -187,9 +187,10 @@ public final class WattsUpConfig
         }
 
         /**
+         * Factory method 
          * @param sym
-         *            The symbol of the delimiter.
-         * @return An instance of the enumeration that has the given symbol.
+         *            The delimiter.
+         * @return The enumeration's instance. 
          * @throws IllegalArgumentException
          *             If the given symbol is unknown by this enumeration.
          */

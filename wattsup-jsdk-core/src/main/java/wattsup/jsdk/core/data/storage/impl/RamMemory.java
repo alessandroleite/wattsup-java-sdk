@@ -29,7 +29,7 @@ import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.storage.Memory;
 import wattsup.jsdk.core.serialize.Serializer;
 
-public class RamMemory<T> implements Memory<T>
+public final class RamMemory<T> implements Memory<T>
 {
     /**
      * A thread-safe {@link Map}'s instance to store the measurements.

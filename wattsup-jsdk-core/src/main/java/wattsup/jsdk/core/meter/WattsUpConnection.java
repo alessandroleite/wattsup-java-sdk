@@ -65,9 +65,9 @@ class WattsUpConnection implements Closeable
     }
 
     /**
-     * Returns <code>true</code> if the connection with the meter was successfully established.
+     * Returns <code>true</code> if a connection with the meter was successfully established.
      * 
-     * @return <code>true</code> if the connection with the meter was successfully established.
+     * @return <code>true</code> if a connection with the meter was successfully established.
      */
     protected boolean connect()
     {

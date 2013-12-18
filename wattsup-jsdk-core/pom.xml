@@ -17,6 +17,9 @@
 		<license-header-file>${basedir}/../LICENSE</license-header-file>
 		<checkstyle.file>${project.basedir}/../checkstyle.xml</checkstyle.file>
 		<nrjavaserial.version>3.8.8</nrjavaserial.version>
+		<dropwizard.version>0.6.2</dropwizard.version>
+		<jdbi.version>2.51</jdbi.version>
+		<joda-time.version>2.2</joda-time.version>
 	</properties>
 
 	<dependencies>
@@ -26,6 +29,26 @@
 			<version>${nrjavaserial.version}</version>
 			<scope>compile</scope>
 		</dependency>
-	</dependencies>
 
+		<dependency>
+			<groupId>com.yammer.dropwizard</groupId>
+			<artifactId>dropwizard-jdbi</artifactId>
+			<version>${dropwizard.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.yammer.dropwizard</groupId>
+					<artifactId>dropwizard-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+		   <groupId>joda-time</groupId>
+		   <artifactId>joda-time</artifactId>
+		   <version>${joda-time.version}</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.jdbi</groupId> <artifactId>jdbi</artifactId> 
+			<version>${jdbi.version}</version> </dependency> -->
+	</dependencies>
 </project>

@@ -26,9 +26,8 @@ import java.io.Serializable;
 
 import wattsup.jsdk.core.serialize.Serializer;
 
-public class ObjectSerializer implements Serializer
+public final class ObjectSerializer implements Serializer
 {
-
     @Override
     public int serialize(OutputStream out, Serializable value) throws IOException
     {

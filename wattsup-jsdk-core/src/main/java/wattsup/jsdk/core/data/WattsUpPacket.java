@@ -37,7 +37,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     /**
      * The delimiter of a record (line). This cannot be changed.
      */
-    private static final String RECORD_DELIMITER = ";";
+    private static final Delimiter RECORD_DELIMITER = Delimiter.SEMICOLON;
 
     /**
      * The labels defined by the power meter.
@@ -130,7 +130,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
         WattsUpPacket[] packets = new WattsUpPacket[0];
         if (data != null && data.length() > 0)
         {
-            String[] lines = data.split(RECORD_DELIMITER);
+            String[] lines = data.split(RECORD_DELIMITER.getSymbol());
 
             // if (lines.length > 3)
             // {
@@ -163,7 +163,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
         {
             final String record = records[i].trim();
 
-            if (!record.startsWith("#d") && !record.endsWith(RECORD_DELIMITER))
+            if (!record.startsWith("#d") && !record.endsWith(RECORD_DELIMITER.getSymbol()))
             {
                 continue;
             }

@@ -25,7 +25,6 @@ import wattsup.jsdk.core.serialize.Serializer;
 
 public interface Memory<T>
 {
-
     /**
      * Clear this memory removing all entries.
      */
