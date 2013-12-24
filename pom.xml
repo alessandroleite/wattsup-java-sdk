@@ -21,6 +21,8 @@
 		<java.source.version>1.7</java.source.version>
 		<license-header-file>${basedir}/LICENSE</license-header-file>
 		<checkstyle.file>${project.basedir}/checkstyle.xml</checkstyle.file>
+		<junit.version>4.10</junit.version>
+		<jcommander.version>1.30</jcommander.version>
 	</properties>
 
 
@@ -61,6 +63,7 @@
 	</developers>
 
 	<modules>
+		<module>wattsup-jsdk-agent</module>
 		<module>wattsup-jsdk-client</module>
 		<module>wattsup-jsdk-console</module>
 		<module>wattsup-jsdk-core</module>
@@ -68,6 +71,22 @@
 		<module>wattsup-jsdk-server</module>
 		<module>wattsup-jsdk-ui</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.beust</groupId>
+				<artifactId>jcommander</artifactId>
+				<version>${jcommander.version}</version>
+				<scope>compile</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<defaultGoal>package</defaultGoal>

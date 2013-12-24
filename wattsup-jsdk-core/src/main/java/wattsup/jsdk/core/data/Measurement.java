@@ -374,4 +374,12 @@ public final class Measurement implements Serializable, Comparable<Measurement>
     {
         return Long.compare(this.getTime(), other.getTime());
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        return sb.toString();
+    }
 }

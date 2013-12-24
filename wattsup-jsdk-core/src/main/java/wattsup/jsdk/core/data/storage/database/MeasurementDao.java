@@ -30,15 +30,15 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
 import wattsup.jsdk.core.data.Measurement;
-import wattsup.jsdk.core.data.storage.database.MeasurementDAO.MeasurementMapper;
+import wattsup.jsdk.core.data.storage.database.MeasurementDao.MeasurementMapper;
 
 @RegisterMapper(MeasurementMapper.class)
-public interface MeasurementDAO
+public interface MeasurementDao
 {
     /**
      * @param measurement
      */
-    @SqlUpdate("INSERT INTO measurement (time, watts, volts, amps, wattskwh, maxwatts, maxvolts, maxamps,minwatts, minvolts, minamps, powerfactor, dutycycle, powercycle) VALUES (:time, :watts, :volts, :amps, :wattskwh, :maxwatts, :maxvolts, :maxamps, :minwatts, :minvolts, :minamps, :powerfactor, :dutycycle, :powercycle)")
+    @SqlUpdate("INSERT INTO measurement (time, watts, volts, amps, wattskwh, maxwatts, maxvolts, maxamps,minwatts, minvolts, minamps, powerfactor, dutycycle, powercycle) VALUES (:time, :watts, :volts, :amps, :wattsKWh, :maxWatts, :maxVolts, :maxAmps, :minWatts, :minVolts, :minAmps, :powerFactor, :dutyCycle, :powerCycle)")
     void insert(@BindBean Measurement measurement);
 
     /**
@@ -69,7 +69,7 @@ public interface MeasurementDAO
      * @return A not <code>null</code> {@link List} with all measurements.
      */
     @SqlQuery("SELECT id, time, watts, volts, amps, wattskwh, maxwatts, maxvolts, maxamps,minwatts, minvolts, minamps, powerfactor, dutycycle, powercycle FROM measurement order by time asc")
-    List<Measurement> findAllMeasurments();
+    List<Measurement> getAllMeasurments();
 
     /**
      * Counts and returns the number of measurements realized in a given interval.
@@ -105,7 +105,22 @@ public interface MeasurementDAO
         @Override
         public Measurement map(int index, ResultSet rs, StatementContext ctx) throws SQLException
         {
+            int i = 2;
             Measurement measurement = new Measurement();
+            measurement.setTime(rs.getLong(i++));
+            measurement.setWatts(rs.getDouble(i++));
+            measurement.setVolts(rs.getDouble(i++));
+            measurement.setAmps(rs.getDouble(i++));
+            measurement.setWattsKWh(rs.getDouble(i++));
+            measurement.setMaxWatts(rs.getDouble(i++));
+            measurement.setMaxVolts(rs.getDouble(i++));
+            measurement.setMaxAmps(rs.getDouble(i++));
+            measurement.setMinWatts(rs.getDouble(i++));
+            measurement.setMinVolts(rs.getDouble(i++));
+            measurement.setMinAmps(rs.getDouble(i++));
+            measurement.setPowerFactor(rs.getDouble(i++));
+            measurement.setDutyCycle(rs.getDouble(i++));
+            measurement.setPowerCycle(rs.getDouble(i++));
 
             return measurement;
         }

@@ -15,9 +15,12 @@
 --     along with this program.  If not, see <http://www.gnu.org/licenses/>
 --
 
+create database wattsup;
+use wattsup;
+
 create table measurement
 (
-  id bigint not null unsigned primary key,
+  id bigint unsigned not null primary key auto_increment,
   time long not null,
   watts double not null,
   volts double not null,
@@ -34,4 +37,4 @@ create table measurement
   powercycle double not null
 );
 
-create unique index idx_time on measurement (time);
+create unique index idx_time on measurement (time(64));

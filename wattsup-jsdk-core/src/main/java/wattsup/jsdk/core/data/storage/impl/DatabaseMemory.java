@@ -19,14 +19,18 @@ package wattsup.jsdk.core.data.storage.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-import wattsup.jsdk.core.convert.WattsUpPacketMeasurementConverter;
+import wattsup.jsdk.core.convert.MeasurementToWattsUpPacketConverter;
+import wattsup.jsdk.core.convert.WattsUpPacketToMeasurementConverter;
 import wattsup.jsdk.core.data.ID;
 import wattsup.jsdk.core.data.Measurement;
 import wattsup.jsdk.core.data.WattsUpPacket;
 import wattsup.jsdk.core.data.storage.Memory;
-import wattsup.jsdk.core.data.storage.database.MeasurementDAO;
+import wattsup.jsdk.core.data.storage.database.MeasurementDao;
 import wattsup.jsdk.core.serialize.Serializer;
 
 public final class DatabaseMemory implements Memory<WattsUpPacket>
@@ -34,12 +38,25 @@ public final class DatabaseMemory implements Memory<WattsUpPacket>
     /**
      * 
      */
-    private final static WattsUpPacketMeasurementConverter WATTSUP_TO_MEASUREMENT_CONVERTER = new WattsUpPacketMeasurementConverter();
+    private final static WattsUpPacketToMeasurementConverter WATTSUP_TO_MEASUREMENT_CONVERTER = new WattsUpPacketToMeasurementConverter();
+
+    private final static MeasurementToWattsUpPacketConverter MEASUREMENT_TO_WATTSUP_PACKET_CONVERTER = new MeasurementToWattsUpPacketConverter();
 
     /**
      * The object to persist the data into the database.
      */
-    private MeasurementDAO measurementDAO_;
+    private final MeasurementDao measurementDAO_;
+
+    /**
+     * Creates a {@link DatabaseMemory} configuring the database instance to use.
+     * 
+     * @param measurementDao
+     *            {@link MeasurementDao}'s instance. Might not be <code>null</code>.
+     */
+    public DatabaseMemory(MeasurementDao measurementDao)
+    {
+        this.measurementDAO_ = measurementDao;
+    }
 
     /**
      * The time of the first measurement.
@@ -67,9 +84,9 @@ public final class DatabaseMemory implements Memory<WattsUpPacket>
             {
                 this.startTime_ = data.getTime();
             }
-
-            this.measurementDAO_.insert(convert(data));
         }
+
+        this.measurementDAO_.insert(convert(data));
     }
 
     @Override
@@ -81,11 +98,18 @@ public final class DatabaseMemory implements Memory<WattsUpPacket>
     @Override
     public Collection<WattsUpPacket> values()
     {
-        return null;
+        List<WattsUpPacket> values = new ArrayList<>();
+
+        for (Measurement measurement : this.measurementDAO_.findInInterval(this.startTime_, System.currentTimeMillis()))
+        {
+            values.add(convert(measurement));
+        }
+
+        return Collections.unmodifiableList(values);
     }
 
     /**
-     * Converts a {@link WattsUpPacket} object to a {@link Measurement} object.
+     * Converts a {@link WattsUpPacket} object into a {@link Measurement} object.
      * 
      * @param data
      *            The {@link WattsUpPacket} to be converted to {@link Measurement}.
@@ -95,4 +119,17 @@ public final class DatabaseMemory implements Memory<WattsUpPacket>
     {
         return WATTSUP_TO_MEASUREMENT_CONVERTER.convert(data);
     }
+
+    /**
+     * Converts a {@link Measurement} object into a {@link WattsUpPacket} object.
+     * 
+     * @param measurement
+     *            The {@link Measurement} to be converted to {@link WattsUpPacket}.
+     * @return A {@link WattsUpPacket} object with the state of the {@link Measurement}.
+     */
+    private WattsUpPacket convert(Measurement measurement)
+    {
+        return MEASUREMENT_TO_WATTSUP_PACKET_CONVERTER.convert(measurement);
+    }
+
 }

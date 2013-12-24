@@ -17,8 +17,11 @@
 package wattsup.jsdk.core.data;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import wattsup.jsdk.core.data.WattsUpConfig.Delimiter;
 
@@ -60,7 +63,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     private String subCommand_;
 
     /**
-     * The data as returned by the meter.
+     * Meter's measurements.
      */
     private String data_;
 
@@ -70,7 +73,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     private int count_;
 
     /**
-     * The time in milliseconds that this {@link WattsUpPacket} was read.
+     * The time in milliseconds when the measurement was realized.
      */
     private long time_;
 
@@ -115,15 +118,15 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     }
 
     /**
-     * Parser the output of the power meter as an instance of {@link WattsUpPacket}.
+     * Parses the meter's output and creates an instance of {@link WattsUpPacket} for each record read.
      * 
      * @param data
-     *            The data to be parsed. Might not be <code>null</code>.
+     *            Meter's output. Might not be <code>null</code>.
      * @param delimiter
-     *            The delimiter used by the power meter.
+     *            Meter's data delimiter. Might not be <code>null</code>.
      * @param packetTime
-     *            The time that the {@code data} was read.
-     * @return A non <code>null</code> array with the packets.
+     *            Time in milliseconds when (time) {@code data} was read.
+     * @return A not <code>null</code> array with each meter's measurements converted to a {@link WattsUpPacket}.
      */
     public static WattsUpPacket[] parser(final String data, final Delimiter delimiter, long packetTime)
     {
@@ -131,15 +134,6 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
         if (data != null && data.length() > 0)
         {
             String[] lines = data.split(RECORD_DELIMITER.getSymbol());
-
-            // if (lines.length > 3)
-            // {
-            // String [] records = new String[lines.length - 3];
-            // System.arraycopy(lines, 1, records, 0, records.length);
-            // packets = new
-            // WattsUpPacket[Integer.valueOf(lines[0].split(delimiter.getSymbol())[5])];
-            //
-            // }
             packets = parser(lines, delimiter, packetTime);
         }
         return packets;
@@ -148,14 +142,14 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     /**
      * 
      * @param records
-     *            The Watts Up record to be parser to {@link WattsUpPacket}.
+     *            Meter's measurements.
      * @param delimiter
-     *            The reference to the field {@link Delimiter}.
+     *            Data delimiter
      * @param packetTime
      *            The time that the {@code data} was read.
-     * @return A non-null array with the data about the watts up measures.
+     * @return A non-null array with the meter's measures.
      */
-    protected static WattsUpPacket[] parser(final String[] records, final Delimiter delimiter, long packetTime)
+    private static WattsUpPacket[] parser(final String[] records, final Delimiter delimiter, long packetTime)
     {
         List<WattsUpPacket> packets = new LinkedList<>();
 
@@ -236,6 +230,28 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     {
         return fields_.clone();
     }
+    
+    /**
+     * Returns a {@link Field} with the given name.
+     * @param name Field name.
+     * @return {@link Field} with the given name.
+     */
+    public Field get(String name)
+    {
+        //TODO: This method is O(n); change the data structure to a Map to be O(1). 
+        Field f = null;
+        
+        for (Field ff :fields_)
+        {
+            if (ff.getName().equals(name))
+            {
+                f = ff.clone();
+                break;
+            }
+        }
+        
+        return f;
+    }
 
     /**
      * @return the time
@@ -261,5 +277,43 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
     public int compareTo(WattsUpPacket other)
     {
         return Long.valueOf(this.getTime()).compareTo(other.getTime());
+    }
+
+    /**
+     * <p>
+     * Returns a {@link Map} with the meter's data. Each entry is a field, where the key is the field's name and the value is the field's value. In
+     * addition to the meter's data we have the time when the measurement was realized.
+     * </p>
+     * 
+     * @return A read-only {@link Map} with the meter's data.
+     * @see #toMap(boolean)
+     */
+    public Map<String, Object> toMap()
+    {
+        return this.toMap(false);
+    }
+
+    /**
+     * <p>
+     * Returns a {@link Map} with the meter's data. Each entry is a field, where the key is the field's name and the value is the field's value. In
+     * addition to the meter's data we have the time when the measurement was realized. The field's name may contain space if
+     * {@code removeSpaceInFieldsName} is <code>false</code>.
+     * </p>
+     * 
+     * @param removeSpaceInFieldsName
+     *            When <code>true</code> removes spaces from the field's name.
+     * @return A read-only {@link Map} with the meter's data.
+     */
+    public Map<String, Object> toMap(boolean removeSpaceInFieldsName)
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("time", this.getTime());
+
+        for (wattsup.jsdk.core.data.Field f : this.getFields())
+        {
+            map.put(removeSpaceInFieldsName ? f.getName().replace("\\W", "").trim() : f.getName().trim(), Double.valueOf(f.getValue()));
+        }
+
+        return Collections.unmodifiableMap(map);
     }
 }

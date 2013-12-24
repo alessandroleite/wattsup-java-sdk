@@ -17,21 +17,19 @@
 package wattsup.jsdk.core.convert;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import wattsup.jsdk.core.data.Measurement;
 import wattsup.jsdk.core.data.WattsUpPacket;
 
-public class WattsUpPacketMeasurementConverter implements Converter<WattsUpPacket, Measurement>
+public class WattsUpPacketToMeasurementConverter implements Converter<WattsUpPacket, Measurement>
 {
     @Override
     public Measurement convert(WattsUpPacket input)
     {
         final Measurement measurement = new Measurement();
 
-        Map<String, Object> wattsupFields = asMap(input);
+        Map<String, Object> wattsupFields = input.toMap(true);
 
         for (Field f : measurement.getClass().getFields())
         {
@@ -48,18 +46,5 @@ public class WattsUpPacketMeasurementConverter implements Converter<WattsUpPacke
         }
 
         return measurement;
-    }
-
-    private Map<String, Object> asMap(WattsUpPacket packet)
-    {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("time", packet.getTime());
-
-        for (wattsup.jsdk.core.data.Field f : packet.getFields())
-        {
-            map.put(f.getName().replace("\\W", "").trim(), Double.valueOf(f.getValue()));
-        }
-
-        return Collections.unmodifiableMap(map);
     }
 }

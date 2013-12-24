@@ -46,9 +46,9 @@ public class OutputStreamMemory<T> implements Memory<T>
     private final Serializer serializer_;
 
     /**
-     * The number of bytes write in the {@link OutputStream}.
+     * The number of bytes written onto the {@link OutputStream}.
      */
-    private volatile int size_;
+    private volatile int bytesWritten;
 
     /**
      * 
@@ -79,7 +79,7 @@ public class OutputStreamMemory<T> implements Memory<T>
     {
         try
         {
-            size_ += this.serializer_.serialize(out_, (Serializable) data);
+            bytesWritten += this.serializer_.serialize(out_, (Serializable) data);
         }
         catch (IOException exception)
         {
@@ -90,7 +90,7 @@ public class OutputStreamMemory<T> implements Memory<T>
     @Override
     public synchronized int size()
     {
-        return size_;
+        return bytesWritten;
     }
 
     @Override

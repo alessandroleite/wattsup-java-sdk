@@ -99,6 +99,10 @@ public class RequestHandler
 
         switch (request.getCommand())
         {
+        case CLEAR:
+            memory_.clear();
+            reply(client, request.getId(), true);
+            break;
         case START:
             worker = new AsyncWorker(request.getId(), this.wattsUp_, memory_.getRegion(request.getName()));
             schedule(worker);
@@ -181,7 +185,8 @@ public class RequestHandler
      *            Request id that the response belongs to.
      * @param value
      *            Response's value.
-     * @param compress A flag to indicate if the data must be compressed before the transmission.
+     * @param compress
+     *            A flag to indicate if the data must be compressed before the transmission.
      */
     private void reply(Socket client, ID id, Serializable value)
     {
@@ -189,9 +194,7 @@ public class RequestHandler
         {
             Response response = Response.newResponse(id).withData(value);
 
-            
-            try (GZIPOutputStream gout = new GZIPOutputStream(client.getOutputStream());
-                    ObjectOutputStream oos = new ObjectOutputStream(gout))
+            try (GZIPOutputStream gout = new GZIPOutputStream(client.getOutputStream()); ObjectOutputStream oos = new ObjectOutputStream(gout))
             {
                 oos.writeObject(response);
             }
