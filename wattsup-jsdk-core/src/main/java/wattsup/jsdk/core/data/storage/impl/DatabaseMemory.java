@@ -76,14 +76,11 @@ public final class DatabaseMemory implements Memory<WattsUpPacket>
     }
 
     @Override
-    public void put(ID id, WattsUpPacket data)
+    public synchronized void put(ID id, WattsUpPacket data)
     {
-        synchronized (this)
+        if (this.startTime_ == null)
         {
-            if (this.startTime_ == null)
-            {
-                this.startTime_ = data.getTime();
-            }
+            this.startTime_ = data.getTime();
         }
 
         this.measurementDAO_.insert(convert(data));
