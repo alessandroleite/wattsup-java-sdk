@@ -52,8 +52,6 @@ public class Main
             
             final DBI dbi = new DBI(args.getDatabaseUrl(), args.getDatabaseUser(), args.getDatabasePasswd());
             final MeasurementDao measurementDao = dbi.open(MeasurementDao.class);
-            
-            System.out.println(args.getPort());
 
             WattsUp meter = new WattsUp(new WattsUpConfig().withPort(args.getPort()).scheduleDuration(
                     Integer.valueOf(System.getProperty("measure.duration", "0"))));
@@ -74,11 +72,6 @@ public class Main
         catch (ParameterException exception)
         {
             commander.usage();
-        }
-        
-        synchronized(args)
-        {
-            args.wait();
         }
     }
 

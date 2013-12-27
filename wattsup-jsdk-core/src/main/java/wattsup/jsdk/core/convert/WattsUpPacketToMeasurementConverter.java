@@ -17,6 +17,7 @@
 package wattsup.jsdk.core.convert;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import wattsup.jsdk.core.data.Measurement;
@@ -31,13 +32,18 @@ public class WattsUpPacketToMeasurementConverter implements Converter<WattsUpPac
 
         Map<String, Object> wattsupFields = input.toMap(true);
 
-        for (Field f : measurement.getClass().getFields())
+        for (Field f : measurement.getClass().getDeclaredFields())
         {
+            if (Modifier.isStatic(f.getModifiers()))
+            {
+                continue;
+            }
+            
             f.setAccessible(true);
 
             try
             {
-                f.set(measurement, wattsupFields.get(f.getName()));
+                f.set(measurement, wattsupFields.get(f.getName().replaceAll("_", "").toLowerCase()));
             }
             catch (IllegalArgumentException | IllegalAccessException exception)
             {

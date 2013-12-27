@@ -87,7 +87,7 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
         LABELS[0] = "watts";
         LABELS[1] = "volts";
         LABELS[2] = "amps";
-        LABELS[3] = "kWh";
+        LABELS[3] = "wattskwh";
         LABELS[4] = "cost";
         LABELS[5] = "mo. kWh";
         LABELS[6] = "mo. cost";
@@ -311,7 +311,10 @@ public final class WattsUpPacket implements Serializable, Comparable<WattsUpPack
 
         for (wattsup.jsdk.core.data.Field f : this.getFields())
         {
-            map.put(removeSpaceInFieldsName ? f.getName().replace("\\W", "").trim() : f.getName().trim(), Double.valueOf(f.getValue()));
+            if (f.getName() != null)
+            {
+                map.put(removeSpaceInFieldsName ? f.getName().replaceAll("\\W", "").trim() : f.getName().trim(), Double.valueOf(f.getValue()) / 10);
+            }            
         }
 
         return Collections.unmodifiableMap(map);
