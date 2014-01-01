@@ -48,3 +48,5 @@ Dependencies
 
 This project uses the [nrjavaserial](https://code.google.com/p/nrjavaserial/) and [Java 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/alessandroleite/wattsup-java-sdk/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
