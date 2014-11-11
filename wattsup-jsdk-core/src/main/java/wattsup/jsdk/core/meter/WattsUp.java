@@ -44,6 +44,9 @@ import wattsup.jsdk.core.exception.WattsUpException;
 import wattsup.jsdk.core.listener.WattsUpListener;
 
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CLEAR_MEMORY;
+import static wattsup.jsdk.core.data.command.WattsUpCommand.CHANGE_LOGGING_MODE;
+import static wattsup.jsdk.core.data.command.WattsUpCommand.SET_BASIC_NETWORK_CONFIG;
+import static wattsup.jsdk.core.data.command.WattsUpCommand.SET_EXTENDED_NETWORK_CONFIG;
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CONFIGURE_EXTERNAL_LOGGING_INTERVAL;
 import static wattsup.jsdk.core.data.command.WattsUpCommand.CONFIGURE_INTERNAL_LOGGING_INTERVAL;
 import static wattsup.jsdk.core.data.command.WattsUpCommand.REQUEST_ALL_DATA_LOGGED;
@@ -288,6 +291,107 @@ public final class WattsUp
                 LOG.info(String.format("There was/were %s events(s) waiting to be notified!", waitingTasks.size()));
             }
         }
+    }
+
+    /**
+     * This sets the WattsUp meter to log data out continously to the serial
+     * port. This sends the command #L,W,3,E,0,interval; to the WattsUp meter.
+     * 
+     * Note: The command connect should have been called first.
+     * 
+     * This method was added as part of the ASCETiC project.
+     *
+     * @param interval The time interval between logging data values.
+     * @throws IOException If the communication with the meter is not possible.
+     */
+    public void setLoggingModeSerial(int interval) throws IOException {
+        this.connection_.execute(CHANGE_LOGGING_MODE, "E", "0", String.valueOf(interval));
+    }
+
+    /**
+     * This sets the WattsUp meter to log data out in TCP mode. This sends the
+     * command #L,W,3,T,0,interval; to the WattsUp meter.
+     * 
+     * Note: The command connect should have been called first.
+     * 
+     * This method was added as part of the ASCETiC project.
+     * 
+     * @param interval The time interval between logging data values.
+     * @throws IOException If the communication with the meter is not possible.
+     */
+    public void setLoggingModeTCP(int interval) throws IOException {
+        this.connection_.execute(CHANGE_LOGGING_MODE, "T", "0", String.valueOf(interval));
+    }
+
+    /**
+     * This sets the WattsUp meter to log data to its internal data store. This
+     * sends the command #L,W,3,I,0,interval; to the WattsUp meter.
+     * 
+     * Note: The command connect should have been called first.
+     * 
+     * This method was added as part of the ASCETiC project.
+     *
+     * @param interval The time interval between logging data values.
+     * @throws IOException If the communication with the meter is not possible.
+     */
+    public void setLoggingModeInternal(int interval) throws IOException {
+        this.connection_.execute(CHANGE_LOGGING_MODE, "I", "0", String.valueOf(interval));
+    }
+
+    /**
+     * Sets the Basic Network/Internet Configuration: 
+     * Sends the command #I,S,6,
+     * , , , , , ; to the WattsUp meter.
+     * 
+     * Full Example of Command:
+     * #I,S,6,
+     * 192.168.0.112,
+     * 192.168.0.1,
+     * 192.168.0.1,
+     * 0.0.0.0,
+     * 255.255.255.0,
+     * 1;
+     * 
+     * Note: The command connect should have been called first.
+     * 
+     * This method was added as part of the ASCETiC project.
+     *
+     * @param ipAddress IP address in octet format.
+     * @param gateway IP address in octet format.
+     * @param nameServer IP address in octet format.
+     * @param nameServer2 IP address in octet format.
+     * @param netmask Mask as IP address in octet format.
+     * @param useDHCP If the WattsUp Meter should use DHCP or not.
+     * @throws IOException If the communication with the meter is not possible.
+     */
+    public void setNetworkConfig(String ipAddress, String gateway,
+            String nameServer, String nameServer2,
+            String netmask, boolean useDHCP) throws IOException {
+        String doDHCPStr = (useDHCP ? "1" : "0");
+        this.connection_.execute(SET_BASIC_NETWORK_CONFIG, ipAddress, gateway, nameServer, nameServer2, netmask, doDHCPStr);
+    }
+
+    /**
+     * Sets the Extended Network/Internet Configuration:
+     * Sends the command 
+     *  #I,X,5,<Post Host>,<Post Port>,<Post Address>,<Post File>,
+     * <User Agent>,<Post Interval>; to the WattsUp meter.
+     * 
+     * Note: The command connect should have been called first.
+     * 
+     * This method was added as part of the ASCETiC project.
+     *
+     * @param host URL/IP Address as String, MAX LENGTH 40
+     * @param port Unsigned 16-bit Integer
+     * @param postFile URI as String, MAX LENGTH 80
+     * @param userAgent URL/IP Address as String, DEFAULT: 'WattsUp.NET'
+     * @param interval Time in seconds as 32-bit signed integer
+     * @throws IOException 
+     */
+    public void setExtendedNetworkConfig(String host, int port,
+            String postFile, String userAgent, int interval) throws IOException {
+        this.connection_.execute(SET_EXTENDED_NETWORK_CONFIG, host, String.valueOf(port), 
+                postFile, userAgent, String.valueOf(interval));
     }
 
     /**

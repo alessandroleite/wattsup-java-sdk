@@ -47,6 +47,67 @@ public enum WattsUpCommand
     REQUEST_RECORD_COUNT_LIMIT("#N,R", "Request record count limit", "Record count limit using fields chosen in #C,W command."),
 
     /**
+     * ASCETIC CHANGE FROM BASIC SDK Command to change to sending logging data
+     * to: Serial continuously: "#L,W,3,E,<Reserved>,<Interval>", Mode: Serial:
+     * #L,W,3,E,0,1; TCP: #L,W,3,T,0,1; Internal: #L,W,3,I,0,1;
+     */
+    CHANGE_LOGGING_MODE("#L,W,3", 3, false, true, "Changes the WattsUp meter mode of logging data.", ""),
+   
+    /**
+     * A. Query Basic Network/Internet Configuration:
+     * #i,q,7,<IP Address>,<Gateway>,<Name Server1>,<Name Server2>,
+     *      <Net Mask>,<Do DHCP>,<MAC Address>;
+     *
+     * 1. <IP Address> - IP address in octet format.
+     * 2. <Gateway> - IP address in octet format.
+     * 3. <Name Server1> - IP address in octet format.
+     * 4. <Name Server2> - IP address in octet format.
+     * 5. <Net Mask> - Mask as IP address in octet format.
+     * 6. <Do DHCP> - Boolean - character '0' = False, character '1' = True
+     * 7. <MAC Address> - Address as 48-bit, unsigned integer, READ-ONLY
+     */
+    GET_BASIC_NETWORK_CONFIG("#I,Q,7", 7, false, true, "Gets the WattsUP .NET meter's Network Settings.", ""),
+    /**
+     * B. Set Basic Network/Internet Configuration: 
+     * #I,S,6,<IP Address>,<Gateway>,<Name Server1>,
+     *      <Name Server2>,<Net Mask>,<Do DHCP>;
+     *
+     * 1. <IP Address> - IP address in octet format. 
+     * 2. <Gateway> - IP address
+     * in octet format. 
+     * 3. <Name Server1> - IP address in octet format. 
+     * 4. <Name Server2> - IP address in octet format. 
+     * 5. <Net Mask> - Mask as IP address
+     * in octet format. 
+     * 6. <Do DHCP> - Boolean - character '0' = False, character '1' = True
+     */
+    SET_BASIC_NETWORK_CONFIG("#I,S,6", 6, false, true, "Sets the WattsUP .NET meter's Network Settings.", ""),
+    /**
+     * C. Query Extended Network/Internet Configuration:
+     * #i,e,5,<Post Host>,<Post Port><Post File>,
+     *              <User Agent>,<Post Interval>;
+     * 
+     * <Post Host> - URL/IP Address as String, MAX LENGTH 40
+     * <Post Port> - Unsigned 16-bit Integer
+     * <Post File> - URI as String, MAX LENGTH 80
+     * <User Agent> - URL/IP Address as String, DEFAULT: 'WattsUp.NET'
+     * <Post Interval> - Time in seconds as 32-bit signed integer
+     */
+    GET_EXTENDED_NETWORK_CONFIG("#I,E,5", 5, false, true, "Gets the WattsUP .NET meter's Extended Network Settings.", ""),
+    /**
+     * D. Set Extended Network/Internet Configuration: 
+     * #I,X,5,<Post Host>,<Post Port>,<Post Address>,<Post File>,
+     *      <User Agent>,<Post Interval>;
+     * 
+     * <Post Host> - URL/IP Address as String, MAX LENGTH 40
+     * <Post Port> - Unsigned 16-bit Integer
+     * <Post File> - URI as String, MAX LENGTH 80
+     * <User Agent> - HTTP Client name as String;
+     * <Post Interval> - Time in seconds as 32-bit signed integer
+     */
+    SET_EXTENDED_NETWORK_CONFIG("#I,X,5", 5, false, true, "Sets the WattsUP .NET meter's Extended Network Settings.", ""),	
+	
+    /**
      * Request current sampling interval.
      */
     REQUEST_CURRENT_SAMPLING_INTERVAL("#S,R", "Request current sampling interval.", "The current sampling interval."),

@@ -146,6 +146,7 @@ public class Main extends JFrame
         this.setLocationRelativeTo(null);
 
         meter_.connect();
+        meter_.setLoggingModeSerial(1);
 
         setVisible(true);
     }
@@ -171,19 +172,15 @@ public class Main extends JFrame
 
     /**
      * Creates an {@link WattsUp} to monitor the power consumption.
-     * 
-     * @param args
-     *            The reference to the arguments.
-     * @throws IOException
-     *             If the power meter is not connected.
+     *
+     * @param args The reference to the arguments.
+     * @throws IOException If the power meter is not connected.
      */
-    public static void main(final String[] args) throws IOException
-    {
-        if (args.length == 0)
-        {
-            throw new IllegalArgumentException("The path to the serial port is required!");
+    public static void main(final String[] args) throws IOException {
+        String comPort = "COM9";
+        if (args.length != 0) {
+            comPort = args[0];
         }
-        
-        new Main(new WattsUpConfig().withPort(args[0]).scheduleDuration(Integer.valueOf(System.getProperty("measure.duration", "0"))));
+        new Main(new WattsUpConfig().withPort(comPort).withExternalLoggingInterval(5).scheduleDuration(-1l));
     }
 }
