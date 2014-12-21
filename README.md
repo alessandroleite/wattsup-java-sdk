@@ -4,12 +4,12 @@ wattsup-java-sdk
 What is it ?
 ------------
 
-A Java application to communicate with the [Watts up?](https://www.wattsupmeters.com/secure/products.php?pn=0&wai=0&more=1) and read the available power measurements. The communication is based on the protocol described on [https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf](https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf)
+A Java application to communicate with the [WattsUp?](https://www.wattsupmeters.com/secure/products.php?pn=0&wai=0&more=1) to get the available power measurements. The communication is based on the protocol description available at [https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf](https://www.wattsupmeters.com/secure/downloads/CommunicationsProtocol090824.pdf)
 
 Usage
 ------
 
-Here is a class that connect to the power meter during three minutes and print the measurements on console. 
+Here is a class that connects to the power meter during three minutes and print the measurements data on output console. 
 
 	public final class WattsUpTest
 	{	    
