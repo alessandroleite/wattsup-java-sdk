@@ -54,19 +54,24 @@ public final class Main
         WattsUp meter = new WattsUp(new WattsUpConfig().withPort(args[0]).scheduleDuration(
                 Integer.valueOf(System.getProperty("measure.duration", "0"))));
 
-        OutputStream out = System.out;
-
         final String exportFilePath = System.getProperty("export.file.path");
-        if (exportFilePath != null && !exportFilePath.isEmpty())
-        {
-            out = new FileOutputStream(new File(exportFilePath));
-        }
+        boolean writingOnFile = exportFilePath != null && !exportFilePath.isEmpty();
+        
+        final OutputStream out = !writingOnFile ? System.out : new FileOutputStream(new File(exportFilePath));
 
         meter.registerListener(new WattsUpDisconnectListener()
         {
             @Override
             public void onDisconnect(WattsUpDisconnectEvent event)
             {
+                try
+                {
+                    out.close();
+                }
+                catch (IOException e)
+                {
+                }
+                
                 System.exit(0);
             }
         });

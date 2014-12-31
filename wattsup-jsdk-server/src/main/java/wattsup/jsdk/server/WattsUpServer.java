@@ -19,6 +19,7 @@ package wattsup.jsdk.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import wattsup.jsdk.core.meter.WattsUp;
 
@@ -32,12 +33,12 @@ public final class WattsUpServer implements Runnable
     /**
      * A flag to indicate if the server was started.
      */
-    private volatile boolean started_;
+    private volatile AtomicBoolean started_ = new AtomicBoolean();
 
     /**
      * 
      */
-    private ServerSocket server_;
+    private volatile ServerSocket server_;
 
     /**
      * 
@@ -61,7 +62,7 @@ public final class WattsUpServer implements Runnable
     {
         openConnection();
 
-        while (started_)
+        while (started_.get())
         {
             try
             {
@@ -79,6 +80,7 @@ public final class WattsUpServer implements Runnable
         }
         
         this.requestHandler_.shutdown();
+        stop();
     }
 
     
@@ -88,7 +90,6 @@ public final class WattsUpServer implements Runnable
      */
     public synchronized void stop()
     {
-        this.started_ = false;
         try
         {
             this.server_.close();
@@ -97,6 +98,7 @@ public final class WattsUpServer implements Runnable
         {
             throw new RuntimeException(exception.getMessage(), exception);
         }
+        this.started_.compareAndSet(true, false);
     }
 
     /**
@@ -106,7 +108,7 @@ public final class WattsUpServer implements Runnable
      */
     public synchronized boolean isStopped()
     {
-        return !this.started_;
+        return !this.started_.get();
     }
 
     /**
@@ -117,14 +119,16 @@ public final class WattsUpServer implements Runnable
      */
     private void openConnection()
     {
-        try
+        if (this.started_.compareAndSet(false, true))
         {
-            this.server_ = new ServerSocket(port_);
-            this.started_ = true;
-        }
-        catch (IOException exception)
-        {
-            throw new RuntimeException(exception.getMessage(), exception);
+            try
+            {
+                this.server_ = new ServerSocket(port_);
+            }
+            catch (IOException exception)
+            {
+                throw new RuntimeException(exception.getMessage(), exception);
+            }
         }
     }
 }

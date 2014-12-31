@@ -18,6 +18,8 @@ package wattsup.jsdk.core.data;
 
 import java.io.Serializable;
 
+import com.google.common.base.Objects;
+
 public final class Measurement implements Serializable, Comparable<Measurement>
 {
     /**
@@ -115,9 +117,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param time
      *            the time to set
      */
-    public void setTime(long time)
+    public Measurement setTime(long time)
     {
         this.time_ = time;
+        return this;
     }
 
     /**
@@ -132,9 +135,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param watts
      *            the watts to set
      */
-    public void setWatts(double watts)
+    public Measurement setWatts(double watts)
     {
         this.watts_ = watts;
+        return this;
     }
 
     /**
@@ -149,9 +153,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param volts
      *            the volts to set
      */
-    public void setVolts(double volts)
+    public Measurement setVolts(double volts)
     {
         this.volts_ = volts;
+        return this;
     }
 
     /**
@@ -166,9 +171,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param amps
      *            the amps to set
      */
-    public void setAmps(double amps)
+    public Measurement setAmps(double amps)
     {
         this.amps_ = amps;
+        return this;
     }
 
     /**
@@ -183,9 +189,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param wattsKWh
      *            the wattsKWh to set
      */
-    public void setWattsKWh(double wattsKWh)
+    public Measurement setWattsKWh(double wattsKWh)
     {
         this.wattsKWh_ = wattsKWh;
+        return this;
     }
 
     /**
@@ -200,9 +207,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param maxWatts
      *            the maxWatts to set
      */
-    public void setMaxWatts(double maxWatts)
+    public Measurement setMaxWatts(double maxWatts)
     {
         this.maxWatts_ = maxWatts;
+        return this;
     }
 
     /**
@@ -217,9 +225,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param maxVolts
      *            the maxVolts to set
      */
-    public void setMaxVolts(double maxVolts)
+    public Measurement setMaxVolts(double maxVolts)
     {
         this.maxVolts_ = maxVolts;
+        return this;
     }
 
     /**
@@ -234,9 +243,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param maxAmps
      *            the maxAmps to set
      */
-    public void setMaxAmps(double maxAmps)
+    public Measurement setMaxAmps(double maxAmps)
     {
         this.maxAmps_ = maxAmps;
+        return this;
     }
 
     /**
@@ -251,9 +261,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param minWatts
      *            the minWatts to set
      */
-    public void setMinWatts(double minWatts)
+    public Measurement setMinWatts(double minWatts)
     {
         this.minWatts_ = minWatts;
+        return this;
     }
 
     /**
@@ -268,9 +279,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param minVolts
      *            the minVolts to set
      */
-    public void setMinVolts(double minVolts)
+    public Measurement setMinVolts(double minVolts)
     {
         this.minVolts_ = minVolts;
+        return this;
     }
 
     /**
@@ -285,9 +297,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param minAmps
      *            the minAmps to set
      */
-    public void setMinAmps(double minAmps)
+    public Measurement setMinAmps(double minAmps)
     {
         this.minAmps_ = minAmps;
+        return this;
     }
 
     /**
@@ -302,9 +315,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param powerFactor
      *            the powerFactor to set
      */
-    public void setPowerFactor(double powerFactor)
+    public Measurement setPowerFactor(double powerFactor)
     {
         this.powerFactor_ = powerFactor;
+        return this;
     }
 
     /**
@@ -319,9 +333,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param dutyCycle
      *            the dutyCycle to set
      */
-    public void setDutyCycle(double dutyCycle)
+    public Measurement setDutyCycle(double dutyCycle)
     {
         this.dutyCycle_ = dutyCycle;
+        return this;
     }
 
     /**
@@ -336,9 +351,10 @@ public final class Measurement implements Serializable, Comparable<Measurement>
      * @param powerCycle
      *            the powerCycle to set
      */
-    public void setPowerCycle(double powerCycle)
+    public Measurement setPowerCycle(double powerCycle)
     {
         this.powerCycle_ = powerCycle;
+        return this;
     }
 
     @Override
@@ -357,14 +373,17 @@ public final class Measurement implements Serializable, Comparable<Measurement>
         {
             return true;
         }
+        
         if (obj == null)
         {
             return false;
         }
-        if (getClass() != obj.getClass())
+        
+        if (!getClass().equals(obj.getClass()))
         {
             return false;
         }
+        
         Measurement other = (Measurement) obj;
         return time_ == other.time_;
     }
@@ -378,8 +397,22 @@ public final class Measurement implements Serializable, Comparable<Measurement>
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
-
-        return sb.toString();
+        return Objects.toStringHelper(this)
+                .add("time", getTime())
+                .add("watts", getWatts())
+                .add("volts", getVolts())
+                .add("current", getAmps())
+                .add("kwh", getWattsKWh())
+                .add("max-watts", getMaxWatts())
+                .add("max-voltage", getMaxVolts())
+                .add("max-current", getMaxAmps())
+                .add("min-watts", getMinWatts())
+                .add("min-voltage", getMinVolts())
+                .add("min-current", getMinAmps())
+                .add("power-factor", getPowerFactor())
+                .add ("duty-cycle", getDutyCycle())
+                .add("power-cycle", getPowerCycle())                
+                .omitNullValues()
+                .toString();
     }
 }

@@ -304,7 +304,8 @@ public final class WattsUp
      * @param interval The time interval between logging data values.
      * @throws IOException If the communication with the meter is not possible.
      */
-    public void setLoggingModeSerial(int interval) throws IOException {
+    public void setLoggingModeSerial(int interval) throws IOException 
+    {
         this.connection_.execute(CHANGE_LOGGING_MODE, "E", "0", String.valueOf(interval));
     }
 
@@ -319,7 +320,8 @@ public final class WattsUp
      * @param interval The time interval between logging data values.
      * @throws IOException If the communication with the meter is not possible.
      */
-    public void setLoggingModeTCP(int interval) throws IOException {
+    public void setLoggingModeTCP(int interval) throws IOException 
+    {
         this.connection_.execute(CHANGE_LOGGING_MODE, "T", "0", String.valueOf(interval));
     }
 
@@ -364,9 +366,9 @@ public final class WattsUp
      * @param useDHCP If the WattsUp Meter should use DHCP or not.
      * @throws IOException If the communication with the meter is not possible.
      */
-    public void setNetworkConfig(String ipAddress, String gateway,
-            String nameServer, String nameServer2,
-            String netmask, boolean useDHCP) throws IOException {
+    public void setNetworkConfig(String ipAddress, String gateway, String nameServer, String nameServer2, String netmask, boolean useDHCP)
+            throws IOException
+    {
         String doDHCPStr = (useDHCP ? "1" : "0");
         this.connection_.execute(SET_BASIC_NETWORK_CONFIG, ipAddress, gateway, nameServer, nameServer2, netmask, doDHCPStr);
     }
@@ -388,10 +390,9 @@ public final class WattsUp
      * @param interval Time in seconds as 32-bit signed integer
      * @throws IOException 
      */
-    public void setExtendedNetworkConfig(String host, int port,
-            String postFile, String userAgent, int interval) throws IOException {
-        this.connection_.execute(SET_EXTENDED_NETWORK_CONFIG, host, String.valueOf(port), 
-                postFile, userAgent, String.valueOf(interval));
+    public void setExtendedNetworkConfig(String host, int port, String postFile, String userAgent, int interval) throws IOException
+    {
+        this.connection_.execute(SET_EXTENDED_NETWORK_CONFIG, host, String.valueOf(port), postFile, userAgent, String.valueOf(interval));
     }
 
     /**
@@ -424,7 +425,7 @@ public final class WattsUp
      * @param interval
      *            The interval in seconds to be set. Might be greater than zero.
      * @throws IOException
-     *             If the communication with the meter is not possible.
+     *             If the communication with the meter is impossible.
      */
     public void configureInternalLoggingInterval(int interval) throws IOException
     {
@@ -457,7 +458,7 @@ public final class WattsUp
     }
 
     /**
-     * Start up logging with the given {@code interval}.
+     * Start up logging according to the configuration {@code config_}.
      */
     protected void start()
     {
